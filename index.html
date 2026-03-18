@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conciliación Bancaria — PORTALES SaaS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; font-size: 14px; }
+
+    /* ── NAVBAR ── */
+    nav {
+      background: #0f172a; color: #fff; display: flex; align-items: center;
+      padding: 0 24px; height: 52px; gap: 16px; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+    .nav-brand { font-size: 16px; font-weight: 700; letter-spacing: .5px; color: #fff; }
+    .badge-elite {
+      background: linear-gradient(135deg,#16a34a,#22c55e); color: #fff;
+      padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
+    .nav-op { color: #94a3b8; font-size: 12px; margin-right: auto; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a {
+      color: #cbd5e1; text-decoration: none; padding: 6px 12px; border-radius: 6px;
+      font-size: 13px; transition: background .15s;
+    }
+    .nav-links a:hover { background: #1e293b; color: #fff; }
+    .btn-logout {
+      border: 1px solid #ef4444; color: #ef4444; background: transparent;
+      padding: 5px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-logout:hover { background: #ef4444; color: #fff; }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: #fff; border-radius: 12px; border-left: 4px solid #3b82f6;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 24px;
+    }
+    .card-title { font-size: 17px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+    .card-sub { color: #64748b; font-size: 12px; margin-bottom: 20px; }
+    hr.divider { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+
+    /* ── MONTH PICKER BOX ── */
+    .mes-box {
+      border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 20px;
+    }
+    .mes-box-label {
+      display: flex; align-items: center; gap: 6px;
+      color: #2563eb; font-size: 12px; font-weight: 700; letter-spacing: .5px;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .mes-box-hint { color: #3b82f6; font-size: 11px; margin-bottom: 8px; }
+    .mes-box input[type="month"] {
+      width: 100%; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 10px;
+      font-size: 14px; background: #fff; color: #1e293b; outline: none;
+      transition: border-color .15s;
+    }
+    .mes-box input:focus { border-color: #3b82f6; }
+
+    /* ── FILE INPUTS ── */
+    .file-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .file-group label.file-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .5px; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+    .file-input-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .file-input-wrap input[type="file"] { display: none; }
+    .btn-file {
+      background: #fff; border: 1px solid #cbd5e1; color: #1e293b;
+      padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer;
+      white-space: nowrap; transition: all .15s;
+    }
+    .btn-file:hover { background: #f8fafc; border-color: #94a3b8; }
+    .file-name { color: #64748b; font-size: 12px; }
+    .file-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      margin-left: 6px;
+    }
+    .tag-banco { background: #dbeafe; color: #1d4ed8; }
+    .tag-erp { background: #dcfce7; color: #15803d; }
+    .tag-error { background: #fee2e2; color: #b91c1c; }
+
+    /* ── COMMUNITY SELECTOR ── */
+    .label-upper { font-size: 11px; font-weight: 700; letter-spacing: .5px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+    .community-row { display: flex; align-items: center; gap: 8px; }
+    select.sel-comunidad {
+      flex: 1; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px;
+      font-size: 14px; color: #1e293b; background: #fff; outline: none;
+      transition: border-color .15s; cursor: pointer;
+    }
+    select.sel-comunidad:focus { border-color: #3b82f6; }
+    .btn-add-com {
+      border: 1px dashed #3b82f6; color: #3b82f6; background: transparent;
+      padding: 9px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+      white-space: nowrap; transition: all .15s;
+    }
+    .btn-add-com:hover { background: #eff6ff; }
+
+    /* ── BADGES ── */
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .badge {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .badge-dark { background: #1e293b; color: #f8fafc; }
+    .badge-blue { background: #3b82f6; color: #fff; }
+    .badge-purple { background: #7c3aed; color: #fff; }
+    .badge-slate { background: #475569; color: #fff; }
+
+    /* ── EXECUTE BUTTON ── */
+    .btn-execute {
+      width: 100%; margin-top: 20px; background: linear-gradient(135deg,#16a34a,#22c55e);
+      color: #fff; border: none; border-radius: 10px; padding: 16px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: opacity .2s, transform .1s; box-shadow: 0 4px 12px rgba(22,163,74,.3);
+    }
+    .btn-execute:hover { opacity: .92; }
+    .btn-execute:active { transform: scale(.99); }
+    .btn-execute:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-execute .icon { font-size: 20px; }
+
+    /* ── TERMINAL ── */
+    #terminal {
+      background: #0f172a; border-radius: 10px; padding: 16px;
+      font-family: 'Courier New', monospace; font-size: 12px;
+      max-height: 240px; overflow-y: auto; display: none;
+    }
+    #terminal-log { display: flex; flex-direction: column; gap: 3px; }
+    .t-line { padding: 1px 0; }
+    .t-info { color: #94a3b8; }
+    .t-success { color: #4ade80; }
+    .t-warn { color: #fbbf24; }
+    .t-error { color: #f87171; }
+    .t-title { color: #38bdf8; font-weight: bold; }
+
+    /* ── RESULTS ── */
+    #resultados { display: none; }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+    }
+    .stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-chip {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: 8px 14px; text-align: center;
+    }
+    .stat-val { font-size: 20px; font-weight: 800; color: #1e293b; }
+    .stat-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
+
+    .btn-export {
+      background: #1d4ed8; color: #fff; border: none; border-radius: 8px;
+      padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: opacity .15s;
+    }
+    .btn-export:hover { opacity: .88; }
+
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filter-btn {
+      border: 1px solid #e2e8f0; background: #fff; padding: 5px 14px;
+      border-radius: 20px; font-size: 12px; cursor: pointer; transition: all .15s;
+    }
+    .filter-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .filter-btn:hover:not(.active) { background: #f1f5f9; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #f8fafc; color: #64748b; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px;
+      padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0;
+      position: sticky; top: 0;
+    }
+    tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .1s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 9px 12px; vertical-align: middle; }
+    .td-amount { font-weight: 700; color: #15803d; font-family: monospace; }
+    .td-unit { font-weight: 700; color: #1e293b; }
+
+    .status-pill {
+      padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .3px; white-space: nowrap;
+    }
+    .pill-conciliado { background: #dcfce7; color: #15803d; }
+    .pill-sugerido { background: #fef9c3; color: #a16207; }
+    .pill-sin_match { background: #fee2e2; color: #b91c1c; }
+    .pill-historico { background: #e0e7ff; color: #3730a3; }
+
+    .nivel-badge {
+      width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: #475569;
+      font-size: 10px; font-weight: 700; display: inline-flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .nivel-1 { background: #d1fae5; color: #065f46; }
+    .nivel-2 { background: #dbeafe; color: #1e3a8a; }
+    .nivel-3 { background: #ede9fe; color: #4c1d95; }
+    .nivel-4 { background: #fef3c7; color: #78350f; }
+    .nivel-5 { background: #fee2e2; color: #7f1d1d; }
+
+    .btn-fix {
+      border: 1px solid #e2e8f0; background: #fff; padding: 3px 10px;
+      border-radius: 6px; font-size: 11px; cursor: pointer; transition: all .15s;
+      color: #475569;
+    }
+    .btn-fix:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      display: none; align-items: center; justify-content: center; z-index: 200;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 14px; padding: 28px;
+      width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+    .form-group input, .form-group select {
+      width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 12px;
+      font-size: 14px; outline: none; transition: border-color .15s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: #3b82f6; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+    .btn-cancel { border: 1px solid #e2e8f0; background: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+    .btn-save { background: #3b82f6; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    /* ── MATCH MODAL ── */
+    #modal-match .deudas-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+    .deuda-option {
+      border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;
+      cursor: pointer; transition: all .15s; display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .deuda-option:hover { border-color: #3b82f6; background: #eff6ff; }
+    .deuda-info strong { font-size: 13px; }
+    .deuda-info small { color: #64748b; font-size: 11px; display: block; }
+    .deuda-monto { font-weight: 700; color: #15803d; font-size: 13px; }
+
+    .hidden { display: none !important; }
+    @media(max-width:600px) {
+      .file-row { grid-template-columns: 1fr; }
+      nav { flex-wrap: wrap; height: auto; padding: 10px; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════ NAVBAR ════ -->
+<nav>
+  <span class="nav-brand">PORTALES SaaS</span>
+  <span class="badge-elite">⚡ Elite Sync</span>
+  <span class="nav-op">(Operador: Dueño (Admin))</span>
+  <div class="nav-links">
+    <a href="#">🏢 Comunidades</a>
+    <a href="#">💰 Finanzas</a>
+    <a href="#">⚖️ Legal &amp; RRHH</a>
+    <a href="#">⚙️ Configuración</a>
+  </div>
+  <button class="btn-logout">Cerrar Sesión</button>
+</nav>
+
+<!-- ════ MAIN ════ -->
+<main>
+
+  <!-- ── Card 1: Carga de Archivos ── -->
+  <div class="card">
+    <div class="card-title">1. Carga de Archivos del Mes</div>
+    <div class="card-sub">Sube la boleta y la cartola cruda. El motor determinista hará el cruce exacto.</div>
+
+    <div class="mes-box">
+      <div class="mes-box-label">📅 DEFINIR MES DE GASTO COMÚN EN CURSO</div>
+      <div class="mes-box-hint">Obligatorio. Define a qué período corresponden estos pagos.</div>
+      <input type="month" id="inp-mes" />
+    </div>
+
+    <div class="file-row">
+      <!-- Archivo ERP -->
+      <div class="file-group">
+        <label class="file-label">Archivo de Deuda (Software)</label>
+        <div class="file-input-wrap">
+          <label class="btn-file" for="inp-erp">Seleccionar archivo</label>
+          <input type="file" id="inp-erp" accept=".xlsx,.xls,.csv" />
+          <span class="file-name" id="lbl-erp">Ningún archivo seleccionado</span>
+        </div>
+        <div id="tag-erp"></div>
+      </div>
+      <!-- Cartola Banco -->
+      <div class="file-group">
+        <label class="file-label">Cartola Bancaria Bruta</label>
+        <div class="file-input-wrap">
+          <label class="btn-file" for="inp-banco">Seleccionar archivo</label>
+          <input type="file" id="inp-banco" accept=".xlsx,.xls,.csv" />
+          <span class="file-name" id="lbl-banco">Ningún archivo seleccionado</span>
+        </div>
+        <div id="tag-banco"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Card 2: Entorno Operativo ── -->
+  <div class="card">
+    <div class="card-title">2. Entorno Operativo</div>
+    <hr class="divider">
+    <div class="label-upper">Comunidad en Proceso:</div>
+    <div class="community-row">
+      <select class="sel-comunidad" id="sel-comunidad">
+        <option value="">-- Seleccionar --</option>
+      </select>
+      <button class="btn-add-com" id="btn-add-com">+ Nueva</button>
+    </div>
+    <div class="badges" id="badges-comunidad">
+      <span class="badge badge-dark">Config: —</span>
+      <span class="badge badge-blue">Residentes: 0</span>
+      <span class="badge badge-purple">Memoria IA: 0</span>
+      <span class="badge badge-slate">Escudo Histórico: 0</span>
+    </div>
+    <button class="btn-execute" id="btn-execute">
+      <span class="icon">⚡</span> Ejecutar Motor de Ingresos
+    </button>
+  </div>
+
+  <!-- ── Terminal ── -->
+  <div class="card" id="terminal" style="padding:16px;">
+    <div id="terminal-log"></div>
+  </div>
+
+  <!-- ── Resultados ── -->
+  <div class="card" id="resultados">
+    <div class="results-header">
+      <div>
+        <div class="card-title">3. Resultados de Conciliación</div>
+        <div class="card-sub" id="res-meta"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-export" id="btn-aprender">🧠 Guardar Memoria IA</button>
+        <button class="btn-export" id="btn-escudo">🛡️ Marcar como Conciliado</button>
+        <button class="btn-export" id="btn-export">⬇️ Exportar ComunidadFeliz</button>
+      </div>
+    </div>
+
+    <div class="stats-row" id="stats-row"></div>
+
+    <div class="filter-bar" id="filter-bar" style="margin-top:14px;">
+      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn" data-filter="conciliado">Conciliados</button>
+      <button class="filter-btn" data-filter="sugerido">Sugeridos</button>
+      <button class="filter-btn" data-filter="sin_match">Sin Match</button>
+      <button class="filter-btn" data-filter="historico">Histórico</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="tabla-res">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Descripción Banco</th>
+            <th>Monto</th>
+            <th>Estado</th>
+            <th>Niv.</th>
+            <th>Método</th>
+            <th>Unidad</th>
+            <th>Propietario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-res"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ════ MODAL: Nueva Comunidad ════ -->
+<div class="modal-overlay" id="modal-comunidad">
+  <div class="modal-box">
+    <div class="modal-title">➕ Nueva Comunidad</div>
+    <div class="form-group">
+      <label>Nombre de la comunidad</label>
+      <input type="text" id="cm-nombre" placeholder="Ej: Edificio Las Américas" />
+    </div>
+    <div class="form-group">
+      <label>Banco principal</label>
+      <select id="cm-banco">
+        <option value="">-- Sin especificar --</option>
+        <option value="BCI">BCI</option>
+        <option value="SCOTIABANK">Scotiabank</option>
+        <option value="CHILE">Banco de Chile</option>
+        <option value="ESTADO">Banco Estado</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Software ERP</label>
+      <select id="cm-erp">
+        <option value="">-- Sin especificar --</option>
+        <option value="COMUNIDAD_FELIZ">ComunidadFeliz</option>
+        <option value="EDIPRO">Edipro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>N° Cuenta (referencia)</label>
+      <input type="text" id="cm-cuenta" placeholder="Ej: 123456789" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modal-comunidad-cancel">Cancelar</button>
+      <button class="btn-save" id="modal-comunidad-save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: Asignación Manual ════ -->
+<div class="modal-overlay" id="modal-match">
+  <div class="modal-box" style="max-width:540px;">
+    <div class="modal-title">🔍 Asignar Manualmente</div>
+    <div id="match-tx-info" style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;"></div>
+    <div class="label-upper" style="margin-bottom:8px;">Selecciona la unidad correcta:</div>
+    <input type="text" id="match-search" placeholder="Buscar por nombre o unidad..." style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:13px;outline:none;" />
+    <div class="deudas-list" id="deudas-list"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modal-match-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// DICCIONARIOS — Mapeo de Cabeceras por Banco/ERP
+// ═══════════════════════════════════════════════
+const DICCIONARIOS = {
+  bancos: {
+    BCI: {
+      nombre: 'BCI',
+      detectarNombreArchivo: ['bci'],
+      detectarContenido: ['banco bci', 'banco de crédito', 'banco de credito'],
+      headerKeywords: ['fecha', 'descripci', 'abono'],
+      columnas: {
+        fecha:       ['Fecha','FECHA','Fecha Transacción','Fecha Mov.','Fecha mov'],
+        descripcion: ['Descripción','Descripcion','DESCRIPCION','Glosa','Detalle','Descripción de la Operación'],
+        cargo:       ['Cargo','CARGO','Débito','Debito','Monto Cargo','Monto Débito'],
+        abono:       ['Abono','ABONO','Crédito','Credito','Monto Abono','Monto Crédito'],
+        saldo:       ['Saldo','SALDO','Saldo Final'],
+        rut:         ['RUT','Rut','R.U.T.','RUT Titular','RUT Originante','RUT Remitente'],
+        nDocumento:  ['N° Documento','Nro. Documento','N°Doc','Número','N° Doc.','Numero Operación'],
+      },
+      filtrarGlosas: ['transbank','tbk','pago masivo','abono masivo','cargo cuota','comisión','comision','iva comisión','canje','interés','interes','seguimiento','seguro','cargo men'],
+    },
+    SCOTIABANK: {
+      nombre: 'Scotiabank',
+      detectarNombreArchivo: ['scotiabank','scotia','nova'],
+      detectarContenido: ['scotiabank','nova'],
+      headerKeywords: ['fecha', 'concepto', 'abono'],
+      columnas: {
+        fecha:       ['Fecha','FECHA','Fecha Transacción','Fecha de Transacción','Fecha Op.'],
+        descripcion: ['Descripción','Descripcion','Concepto','Glosa','Detalle Transacción','Detalle'],
+        cargo:       ['Cargo','Débito','Monto Débito','Cargos','Monto Cargo'],
+        abono:       ['Abono','Crédito','Monto Crédito','Abonos','Monto Abono'],
+        saldo:       ['Saldo','Saldo Final','Saldo Disponible'],
+        rut:         ['RUT','RUT Remitente','R.U.T.','RUT Origen'],
+        nDocumento:  ['N° Documento','Número Referencia','Referencia','N° Referencia'],
+      },
+      filtrarGlosas: ['transbank','tbk','cte.','cargo mensual','comisión','iva','seguro','débito automático'],
+    },
+    CHILE: {
+      nombre: 'Banco de Chile',
+      detectarNombreArchivo: ['chile','bchile','banco chile'],
+      detectarContenido: ['banco de chile','bancodechile','bco. chile'],
+      headerKeywords: ['fecha', 'descripci', 'cargo', 'abono'],
+      columnas: {
+        fecha:       ['Fecha','FECHA','Fch.','Fecha Op.','Fecha Operación'],
+        descripcion: ['Descripción','Descripcion','Glosa','Motivo','Concepto','Descripción de la transacción'],
+        cargo:       ['Cargo','Cargos','Débito','Débitos','Monto Débito'],
+        abono:       ['Abono','Abonos','Crédito','Créditos','Monto Crédito'],
+        saldo:       ['Saldo','Saldo al día','Saldo Disponible'],
+        rut:         ['RUT Origen','RUT','R.U.T.','RUT Remitente','RUT Emisor'],
+        nDocumento:  ['N° Operación','N° Documento','N° Trans.','Número','N°Operación'],
+      },
+      filtrarGlosas: ['transbank','tbk','comisión','cargo cta','débito automático','pago bip','pago tag','cajero','atm','iva comisión'],
+    },
+    ESTADO: {
+      nombre: 'Banco Estado',
+      detectarNombreArchivo: ['estado','bancoestado','bco estado','bcoestado'],
+      detectarContenido: ['banco estado','bancoestado','bco. estado'],
+      headerKeywords: ['fecha', 'detalle', 'abono'],
+      columnas: {
+        fecha:       ['Fecha','FECHA','Fecha Transacción','Fecha Mov'],
+        descripcion: ['Descripción','Descripcion','Detalle','Concepto','Glosa','Descripcion Transacción'],
+        cargo:       ['Cargo','Débito','Monto Cargo','Monto Débito'],
+        abono:       ['Abono','Crédito','Monto Abono','Monto Crédito'],
+        saldo:       ['Saldo','Saldo Actual','Saldo Disponible'],
+        rut:         ['RUT','RUT Emisor','R.U.T.','RUT Origen'],
+        nDocumento:  ['N° Documento','Folio','N° Operación','Numero Operación'],
+      },
+      filtrarGlosas: ['transbank','tbk','cuentarut','serviestado','comisión','iva comisión','cargo mensual','pago automático'],
+    },
+  },
+  erp: {
+    COMUNIDAD_FELIZ: {
+      nombre: 'ComunidadFeliz',
+      detectarNombreArchivo: ['comunidad','feliz','boleta','cf_','_cf','cfboleta'],
+      detectarContenido: ['comunidadfeliz','comunidad feliz'],
+      detectarColumnas: ['folio','propiedad','residente'],
+      columnas: {
+        folio:     ['Folio','FOLIO','N° Boleta','Número Boleta','N° Documento','Folio Boleta'],
+        propiedad: ['Propiedad','PROPIEDAD','Unidad','UNIDAD','Dpto','Depto','N° Unidad','Número Unidad','Unidad/Dpto'],
+        nombre:    ['Nombre','NOMBRE','Propietario','Residente','Titular','Nombre Residente','Nombre Propietario'],
+        rut:       ['RUT','Rut','R.U.T.','RUT Deudor','RUT Residente','Rut Propietario'],
+        monto:     ['Monto','MONTO','Total','Deuda','Monto Deuda','Saldo','Total Deuda','Monto Total'],
+        periodo:   ['Período','Periodo','Mes','MES','Período Deuda','Mes Gasto'],
+      },
+    },
+    EDIPRO: {
+      nombre: 'Edipro',
+      detectarNombreArchivo: ['edipro'],
+      detectarContenido: ['edipro'],
+      detectarColumnas: ['unidad','propietario'],
+      columnas: {
+        folio:     ['Folio','N° Documento','Numero','N° Recibo','Comprobante','Folio Documento'],
+        propiedad: ['Unidad','Propiedad','Depto','N° Unidad','Número Unidad','Depto/Unidad','N°Unidad'],
+        nombre:    ['Nombre','Propietario','Titular','Nombre Propietario','Nombre Titular'],
+        rut:       ['RUT','Rut','R.U.T.','RUT Prop.','RUT Propietario'],
+        monto:     ['Monto','Total','Saldo','Deuda Total','Total a Pagar','Monto Total','Total Deuda'],
+        periodo:   ['Mes','Período','Periodo','Mes Gasto','Período Gasto'],
+      },
+    },
+  },
+};
+
+// ═══════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════
+const STATE = {
+  mes: null,
+  comunidadId: null,
+  rawERP: null,
+  rawBanco: null,
+  tipoERP: null,
+  tipoBanco: null,
+  deudas: [],
+  transacciones: [],
+  resultados: [],
+  filtroActivo: 'todos',
+};
+
+// ═══════════════════════════════════════
+// STORAGE: Comunidades
+// ═══════════════════════════════════════
+const Comunidades = {
+  _k: 'ps_comunidades',
+  getAll() { try { return JSON.parse(localStorage.getItem(this._k) || '[]'); } catch { return []; } },
+  save(arr) { localStorage.setItem(this._k, JSON.stringify(arr)); },
+  add(obj) {
+    const all = this.getAll();
+    obj.id = Date.now().toString();
+    all.push(obj);
+    this.save(all);
+    return obj;
+  },
+  get(id) { return this.getAll().find(c => c.id === id) || null; },
+};
+
+// ═══════════════════════════════════════
+// STORAGE: Memoria IA
+// ═══════════════════════════════════════
+const MemoriaIA = {
+  _k: 'ps_memoria_ia',
+  getAll() { try { return JSON.parse(localStorage.getItem(this._k) || '{}'); } catch { return {}; } },
+  save(obj) { localStorage.setItem(this._k, JSON.stringify(obj)); },
+  aprender(nombreBanco, rut, unidad, comunidadId) {
+    const m = this.getAll();
+    if (!m[comunidadId]) m[comunidadId] = {};
+    m[comunidadId][this._norm(nombreBanco)] = { rut, unidad };
+    this.save(m);
+    writeTerminal(`🧠 Memoria IA: aprendido "${nombreBanco.substring(0,40)}" → Unidad ${unidad}`, 'success');
+  },
+  buscar(nombreBanco, comunidadId) {
+    const m = this.getAll();
+    const scope = m[comunidadId] || {};
+    return scope[this._norm(nombreBanco)] || null;
+  },
+  count(comunidadId) {
+    const m = this.getAll();
+    return Object.keys(m[comunidadId] || {}).length;
+  },
+  _norm(s) { return String(s || '').toLowerCase().trim().replace(/\s+/g, ' '); },
+};
+
+// ═══════════════════════════════════════
+// STORAGE: Escudo Histórico
+// ═══════════════════════════════════════
+const Escudo = {
+  _k: 'ps_escudo',
+  getAll(cid) { try { const a = JSON.parse(localStorage.getItem(this._k) || '{}'); return a[cid] || []; } catch { return []; } },
+  add(cid, hashes) {
+    const a = JSON.parse(localStorage.getItem(this._k) || '{}');
+    a[cid] = [...new Set([...(a[cid] || []), ...hashes])];
+    localStorage.setItem(this._k, JSON.stringify(a));
+  },
+  has(cid, hash) { return this.getAll(cid).includes(hash); },
+  count(cid) { return this.getAll(cid).length; },
+};
+
+// ═══════════════════════════════════════
+// TERMINAL
+// ═══════════════════════════════════════
+function writeTerminal(msg, type = 'info') {
+  const el = document.getElementById('terminal');
+  const log = document.getElementById('terminal-log');
+  el.style.display = 'block';
+  const line = document.createElement('div');
+  line.className = `t-line t-${type}`;
+  const ts = new Date().toLocaleTimeString('es-CL');
+  line.textContent = `[${ts}] ${msg}`;
+  log.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function clearTerminal() {
+  document.getElementById('terminal-log').innerHTML = '';
+  document.getElementById('terminal').style.display = 'none';
+}
+
+// ═══════════════════════════════════════
+// PARSERS — utilidades compartidas
+// ═══════════════════════════════════════
+function readWorkbook(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        resolve(XLSX.read(data, { type: 'array', cellDates: true }));
+      } catch(err) { reject(err); }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function normalizeRut(rut) {
+  return String(rut || '').replace(/[^0-9kK]/g, '').toUpperCase();
+}
+
+function parseAmount(val) {
+  if (val === null || val === undefined || val === '') return 0;
+  if (typeof val === 'number') return val;
+  return parseFloat(String(val).replace(/[^0-9.,\-]/g, '').replace(',', '.')) || 0;
+}
+
+function parseDate(val) {
+  if (!val) return '';
+  if (val instanceof Date) return val.toLocaleDateString('es-CL');
+  if (typeof val === 'number') {
+    const d = new Date(Math.round((val - 25569) * 86400 * 1000));
+    return d.toLocaleDateString('es-CL');
+  }
+  return String(val);
+}
+
+function hashTx(fecha, desc, monto) {
+  return `${fecha}|${String(desc).substring(0,30)}|${monto}`.replace(/\s/g,'_');
+}
+
+function findHeaderRow(rawData, keywords) {
+  for (let r = 0; r < Math.min(rawData.length, 40); r++) {
+    const row = rawData[r].map(v => String(v || '').toLowerCase().trim());
+    const hits = keywords.filter(k => row.some(v => v.includes(k)));
+    if (hits.length >= 2) return r;
+  }
+  return 0;
+}
+
+function mapColumns(headerRow, variantesMap) {
+  const mapa = {};
+  const headerL = headerRow.map(h => String(h || '').toLowerCase().trim());
+  for (const [campo, variantes] of Object.entries(variantesMap)) {
+    for (const v of variantes) {
+      const idx = headerL.indexOf(v.toLowerCase().trim());
+      if (idx >= 0) { mapa[campo] = idx; break; }
+    }
+  }
+  return mapa;
+}
+
+// ═══════════════════════════════════════
+// BANK PARSER
+// ═══════════════════════════════════════
+const BankParser = {
+  detectar(wb, filename) {
+    const fn = (filename || '').toLowerCase();
+    // Try filename first
+    for (const [k, b] of Object.entries(DICCIONARIOS.bancos)) {
+      if (b.detectarNombreArchivo.some(d => fn.includes(d))) return k;
+    }
+    // Try content
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+    const text = raw.flat().join(' ').toLowerCase();
+    for (const [k, b] of Object.entries(DICCIONARIOS.bancos)) {
+      if (b.detectarContenido.some(d => text.includes(d))) return k;
+    }
+    return null;
+  },
+
+  extraer(wb, tipoBanco) {
+    const banco = DICCIONARIOS.bancos[tipoBanco];
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+    const headerIdx = findHeaderRow(raw, banco.headerKeywords);
+    const mapa = mapColumns(raw[headerIdx], banco.columnas);
+
+    writeTerminal(`📊 Banco detectado: ${banco.nombre}. Cabecera en fila ${headerIdx + 1}. Cols mapeadas: ${Object.keys(mapa).join(', ')}`, 'info');
+
+    const filtros = banco.filtrarGlosas || [];
+    const txs = [];
+
+    for (let r = headerIdx + 1; r < raw.length; r++) {
+      const row = raw[r];
+      if (!row || row.every(v => !v)) continue;
+
+      const fecha = mapa.fecha !== undefined ? parseDate(row[mapa.fecha]) : '';
+      const desc  = mapa.descripcion !== undefined ? String(row[mapa.descripcion] || '') : '';
+      const abono = mapa.abono !== undefined ? parseAmount(row[mapa.abono]) : 0;
+      const rut   = mapa.rut !== undefined ? normalizeRut(row[mapa.rut]) : '';
+      const nDoc  = mapa.nDocumento !== undefined ? String(row[mapa.nDocumento] || '') : '';
+
+      if (abono <= 0) continue;
+      if (!fecha) continue;
+
+      const descL = desc.toLowerCase();
+      if (filtros.some(f => descL.includes(f))) continue;
+
+      txs.push({ id: `tx_${r}`, fecha, descripcion: desc, abono, rut, nDocumento: nDoc, hash: hashTx(fecha, desc, abono) });
+    }
+
+    writeTerminal(`✅ Cartola: ${txs.length} transacciones con abono extraídas (filtradas las no relevantes)`, 'success');
+    return txs;
+  },
+};
+
+// ═══════════════════════════════════════
+// ERP PARSER
+// ═══════════════════════════════════════
+const ERPParser = {
+  detectar(wb, filename) {
+    const fn = (filename || '').toLowerCase();
+    for (const [k, e] of Object.entries(DICCIONARIOS.erp)) {
+      if (e.detectarNombreArchivo.some(d => fn.includes(d))) return k;
+    }
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+    const text = raw.flat().join(' ').toLowerCase();
+    for (const [k, e] of Object.entries(DICCIONARIOS.erp)) {
+      if (e.detectarContenido.some(d => text.includes(d))) return k;
+    }
+    // Column detection fallback
+    for (let r = 0; r < Math.min(raw.length, 20); r++) {
+      const row = raw[r].map(v => String(v || '').toLowerCase().trim());
+      for (const [k, e] of Object.entries(DICCIONARIOS.erp)) {
+        const hits = e.detectarColumnas.filter(kw => row.some(v => v.includes(kw)));
+        if (hits.length >= 2) return k;
+      }
+    }
+    return null;
+  },
+
+  extraer(wb, tipoERP) {
+    const erp = DICCIONARIOS.erp[tipoERP];
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+    const headerIdx = findHeaderRow(raw, erp.detectarColumnas);
+    const mapa = mapColumns(raw[headerIdx], erp.columnas);
+
+    writeTerminal(`📋 ERP detectado: ${erp.nombre}. Cabecera en fila ${headerIdx + 1}. Cols mapeadas: ${Object.keys(mapa).join(', ')}`, 'info');
+
+    const deudas = [];
+    for (let r = headerIdx + 1; r < raw.length; r++) {
+      const row = raw[r];
+      if (!row || row.every(v => !v)) continue;
+
+      const folio     = mapa.folio     !== undefined ? String(row[mapa.folio] || '') : '';
+      const propiedad = mapa.propiedad !== undefined ? String(row[mapa.propiedad] || '').trim() : '';
+      const nombre    = mapa.nombre    !== undefined ? String(row[mapa.nombre] || '').trim() : '';
+      const rut       = mapa.rut       !== undefined ? normalizeRut(row[mapa.rut]) : '';
+      const monto     = mapa.monto     !== undefined ? parseAmount(row[mapa.monto]) : 0;
+      const periodo   = mapa.periodo   !== undefined ? String(row[mapa.periodo] || '') : '';
+
+      if (!propiedad || monto <= 0) continue;
+
+      deudas.push({
+        id: `d_${r}`, folio, propiedad, nombre, rut, monto, periodo,
+        propNorm: propiedad.toUpperCase().replace(/\s+/g, ' ').trim(),
+      });
+    }
+
+    writeTerminal(`✅ ERP: ${deudas.length} deudas extraídas`, 'success');
+    return deudas;
+  },
+};
+
+// ═══════════════════════════════════════
+// MOTOR DE CONCILIACIÓN EN CASCADA
+// ═══════════════════════════════════════
+const Motor = {
+  ejecutar(txs, deudas, comunidadId) {
+    writeTerminal('⚙️  Iniciando Motor de Conciliación en Cascada (5 niveles)...', 'title');
+    const disponibles = [...deudas];
+    const resultados = [];
+
+    for (const tx of txs) {
+      // Nivel 0: Escudo Histórico
+      if (Escudo.has(comunidadId, tx.hash)) {
+        resultados.push({ ...tx, estado: 'historico', estadoLabel: 'Histórico', nivel: 0, metodo: 'Escudo Histórico', confianza: 100, deuda: null });
+        continue;
+      }
+
+      let match = null;
+
+      // Nivel 1: Memoria IA
+      if (!match) {
+        const mem = MemoriaIA.buscar(tx.descripcion, comunidadId);
+        if (mem) {
+          const d = disponibles.find(d => d.propNorm === mem.unidad.toUpperCase() || (mem.rut && d.rut === mem.rut));
+          if (d) match = { deuda: d, nivel: 1, metodo: 'Memoria IA', confianza: 100 };
+        }
+      }
+
+      // Nivel 2: Match por RUT
+      if (!match && tx.rut && tx.rut.length >= 7) {
+        const d = disponibles.find(d => d.rut && d.rut === tx.rut);
+        if (d) match = { deuda: d, nivel: 2, metodo: 'Match RUT', confianza: 95 };
+      }
+
+      // Nivel 3: Glosa / Regex
+      if (!match) {
+        const d = this._buscarEnGlosa(tx.descripcion, disponibles);
+        if (d) match = { deuda: d, nivel: 3, metodo: 'Glosa (Regex)', confianza: 85 };
+      }
+
+      // Nivel 4: Fuzzy Nombre
+      if (!match) {
+        const r = this._fuzzyNombre(tx.descripcion, disponibles);
+        if (r) match = { deuda: r.deuda, nivel: 4, metodo: 'Fuzzy Nombre', confianza: r.score };
+      }
+
+      // Nivel 5: Triangulación Matemática
+      if (!match) {
+        const d = this._triangulacion(tx.abono, disponibles);
+        if (d) match = { deuda: d, nivel: 5, metodo: 'Triangulación $', confianza: 60 };
+      }
+
+      if (match) {
+        const idx = disponibles.findIndex(d => d.id === match.deuda.id);
+        if (idx >= 0) disponibles.splice(idx, 1);
+        const estado = match.nivel <= 3 ? 'conciliado' : 'sugerido';
+        resultados.push({ ...tx, estado, estadoLabel: estado === 'conciliado' ? 'Conciliado' : 'Sugerido', ...match });
+      } else {
+        resultados.push({ ...tx, estado: 'sin_match', estadoLabel: 'Sin Match', nivel: 0, metodo: '—', confianza: 0, deuda: null });
+      }
+    }
+
+    const cnt = { conciliado: 0, sugerido: 0, sin_match: 0, historico: 0 };
+    resultados.forEach(r => cnt[r.estado] = (cnt[r.estado] || 0) + 1);
+    writeTerminal(`📊 Resultados: ${cnt.conciliado} conciliados | ${cnt.sugerido} sugeridos | ${cnt.sin_match} sin match | ${cnt.historico} histórico`, 'success');
+    return resultados;
+  },
+
+  _buscarEnGlosa(desc, disponibles) {
+    const patterns = [
+      /(?:dpto|depto|apto|apartamento|piso|of\.|oficina|casa|local|bod\.|bodega|unidad|unit)[\s.\-#]*(\w{1,5})/gi,
+      /\b(\d{1,4}[a-zA-Z]?)\b/g,
+    ];
+    for (const pat of patterns) {
+      let m;
+      while ((m = pat.exec(desc)) !== null) {
+        const unit = m[1].toUpperCase();
+        if (unit.length < 2) continue;
+        const d = disponibles.find(d => d.propNorm === unit || d.propNorm.split(/\s+/).includes(unit));
+        if (d) return d;
+      }
+    }
+    return null;
+  },
+
+  _fuzzyNombre(desc, disponibles) {
+    const stopwords = new Set(['de','del','la','el','los','las','y','en','a','con','por','para','al','lo','se','un','una']);
+    const tokenizar = t => String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(x => x.length > 2 && !stopwords.has(x));
+    const descTok = tokenizar(desc);
+    if (!descTok.length) return null;
+    let best = 0, bestDeuda = null;
+    for (const d of disponibles) {
+      const nt = tokenizar(d.nombre);
+      if (!nt.length) continue;
+      let hits = 0;
+      for (const t of nt) { if (descTok.some(dt => dt === t || dt.includes(t) || t.includes(dt))) hits++; }
+      const score = Math.round((hits / nt.length) * 100);
+      if (score > best && score >= 65) { best = score; bestDeuda = d; }
+    }
+    return bestDeuda ? { deuda: bestDeuda, score: best } : null;
+  },
+
+  _triangulacion(monto, disponibles) {
+    const exactas = disponibles.filter(d => d.monto === monto);
+    if (exactas.length === 1) return exactas[0];
+    const tol = Math.max(monto * 0.02, 200);
+    const cercanas = disponibles.filter(d => Math.abs(d.monto - monto) <= tol);
+    if (cercanas.length === 1) return cercanas[0];
+    return null;
+  },
+};
+
+// ═══════════════════════════════════════
+// EXPORT ENGINE
+// ═══════════════════════════════════════
+const ExportEngine = {
+  exportar(resultados, mes) {
+    const filas = resultados
+      .filter(r => (r.estado === 'conciliado' || r.estado === 'sugerido') && r.deuda)
+      .map(r => ({
+        'Folio':                    r.deuda.folio || '',
+        'Propiedad':                r.deuda.propiedad || '',
+        'Monto a pagar':            r.abono,
+        'Fecha de pago':            r.fecha,
+        'Medio de pago':            'Transferencia',
+        'Número documento de pago': r.nDocumento || '',
+        'Comentarios del pago':     r.descripcion || '',
+      }));
+
+    if (!filas.length) { alert('No hay transacciones conciliadas para exportar.'); return; }
+
+    const ws = XLSX.utils.json_to_sheet(filas);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Pagos Conciliados');
+    const mesStr = (mes || 'exportacion').replace('-', '_');
+    XLSX.writeFile(wb, `conciliacion_${mesStr}.xlsx`);
+    writeTerminal(`📤 Exportado: conciliacion_${mesStr}.xlsx (${filas.length} pagos)`, 'success');
+  },
+};
+
+// ═══════════════════════════════════════
+// UI — COMUNIDADES
+// ═══════════════════════════════════════
+function renderComunidades() {
+  const sel = document.getElementById('sel-comunidad');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">-- Seleccionar --</option>';
+  Comunidades.getAll().forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.nombre;
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+}
+
+function updateBadges(cid) {
+  const com = cid ? Comunidades.get(cid) : null;
+  const badges = document.getElementById('badges-comunidad');
+  const config = com ? `${com.banco || '?'} / ${com.erp || '?'}` : '—';
+  const res = STATE.deudas.length;
+  const mem = MemoriaIA.count(cid || '');
+  const esc = Escudo.count(cid || '');
+  badges.innerHTML = `
+    <span class="badge badge-dark">Config: ${config}</span>
+    <span class="badge badge-blue">Residentes: ${res}</span>
+    <span class="badge badge-purple">Memoria IA: ${mem}</span>
+    <span class="badge badge-slate">Escudo Histórico: ${esc}</span>
+  `;
+}
+
+// ═══════════════════════════════════════
+// UI — RESULTADOS
+// ═══════════════════════════════════════
+function renderResultados() {
+  const r = STATE.resultados;
+  const filtro = STATE.filtroActivo;
+  const filtrados = filtro === 'todos' ? r : r.filter(x => x.estado === filtro);
+
+  const total = r.length;
+  const conc  = r.filter(x => x.estado === 'conciliado').length;
+  const sug   = r.filter(x => x.estado === 'sugerido').length;
+  const sinM  = r.filter(x => x.estado === 'sin_match').length;
+  const hist  = r.filter(x => x.estado === 'historico').length;
+  const sumConc = r.filter(x => x.estado === 'conciliado' || x.estado === 'sugerido').reduce((a, x) => a + x.abono, 0);
+
+  document.getElementById('res-meta').textContent =
+    `Mes: ${STATE.mes || '—'} | Comunidad: ${Comunidades.get(STATE.comunidadId)?.nombre || '—'}`;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-chip"><div class="stat-val">${total}</div><div class="stat-label">Total</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:#15803d">${conc}</div><div class="stat-label">Conciliados</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:#a16207">${sug}</div><div class="stat-label">Sugeridos</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:#b91c1c">${sinM}</div><div class="stat-label">Sin Match</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:#3730a3">${hist}</div><div class="stat-label">Histórico</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:#15803d;font-size:15px">$${sumConc.toLocaleString('es-CL')}</div><div class="stat-label">Monto Conciliado</div></div>
+  `;
+
+  const tbody = document.getElementById('tbody-res');
+  if (!filtrados.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;">Sin resultados para este filtro</td></tr>'; return; }
+
+  tbody.innerHTML = filtrados.map((r, i) => {
+    const pillClass = `pill-${r.estado}`;
+    const nivelClass = r.nivel > 0 ? `nivel-${r.nivel}` : '';
+    const unidad = r.deuda?.propiedad || '—';
+    const nombre = r.deuda?.nombre || '—';
+    return `<tr data-id="${r.id}">
+      <td style="color:#94a3b8;font-size:11px">${i + 1}</td>
+      <td style="white-space:nowrap">${r.fecha}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.descripcion}">${r.descripcion}</td>
+      <td class="td-amount">$${r.abono.toLocaleString('es-CL')}</td>
+      <td><span class="status-pill ${pillClass}">${r.estadoLabel}</span></td>
+      <td><span class="nivel-badge ${nivelClass}">${r.nivel || '—'}</span></td>
+      <td style="color:#64748b;font-size:11px;white-space:nowrap">${r.metodo}</td>
+      <td class="td-unit">${unidad}</td>
+      <td style="color:#475569">${nombre}</td>
+      <td><button class="btn-fix" data-id="${r.id}">✏️ Fijar</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('resultados').style.display = 'block';
+}
+
+// ═══════════════════════════════════════
+// MODAL: Asignación Manual
+// ═══════════════════════════════════════
+let _currentTxId = null;
+
+function abrirModalMatch(txId) {
+  _currentTxId = txId;
+  const tx = STATE.resultados.find(r => r.id === txId);
+  if (!tx) return;
+
+  document.getElementById('match-tx-info').innerHTML = `
+    <strong>Transacción:</strong> ${tx.descripcion}<br>
+    <strong>Fecha:</strong> ${tx.fecha} &nbsp;|&nbsp; <strong>Monto:</strong> $${tx.abono.toLocaleString('es-CL')}
+    ${tx.rut ? `&nbsp;|&nbsp; <strong>RUT:</strong> ${tx.rut}` : ''}
+  `;
+
+  renderDeudasList('');
+  document.getElementById('modal-match').classList.add('open');
+}
+
+function renderDeudasList(q) {
+  const list = document.getElementById('deudas-list');
+  const deudas = q
+    ? STATE.deudas.filter(d => d.propiedad.toLowerCase().includes(q) || d.nombre.toLowerCase().includes(q) || d.rut.includes(q))
+    : STATE.deudas;
+
+  list.innerHTML = deudas.slice(0, 50).map(d => `
+    <div class="deuda-option" data-did="${d.id}">
+      <div class="deuda-info">
+        <strong>Unidad ${d.propiedad}</strong>
+        <small>${d.nombre} ${d.rut ? '· ' + d.rut : ''}</small>
+      </div>
+      <span class="deuda-monto">$${d.monto.toLocaleString('es-CL')}</span>
+    </div>
+  `).join('') || '<p style="color:#94a3b8;text-align:center;padding:16px">Sin resultados</p>';
+}
+
+function asignarManualmente(deudaId) {
+  const tx = STATE.resultados.find(r => r.id === _currentTxId);
+  const deuda = STATE.deudas.find(d => d.id === deudaId);
+  if (!tx || !deuda) return;
+
+  tx.deuda = deuda;
+  tx.estado = 'conciliado';
+  tx.estadoLabel = 'Conciliado';
+  tx.nivel = 1;
+  tx.metodo = 'Manual → IA';
+  tx.confianza = 100;
+
+  // Aprender para la próxima vez
+  if (STATE.comunidadId) {
+    MemoriaIA.aprender(tx.descripcion, deuda.rut, deuda.propNorm, STATE.comunidadId);
+  }
+
+  document.getElementById('modal-match').classList.remove('open');
+  renderResultados();
+  updateBadges(STATE.comunidadId);
+}
+
+// ═══════════════════════════════════════
+// MAIN FLOW
+// ═══════════════════════════════════════
+async function ejecutarMotor() {
+  clearTerminal();
+
+  const mes = document.getElementById('inp-mes').value;
+  const cid = document.getElementById('sel-comunidad').value;
+
+  if (!mes) { alert('Debes definir el mes de gasto común.'); return; }
+  if (!cid) { alert('Debes seleccionar una comunidad.'); return; }
+  if (!STATE.rawBanco) { alert('Sube la cartola bancaria.'); return; }
+  if (!STATE.rawERP)   { alert('Sube el archivo de deuda (ERP).'); return; }
+
+  STATE.mes = mes;
+  STATE.comunidadId = cid;
+
+  const btn = document.getElementById('btn-execute');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="icon">⏳</span> Procesando...';
+
+  try {
+    writeTerminal(`🚀 Motor iniciado | Mes: ${mes} | Comunidad: ${Comunidades.get(cid)?.nombre}`, 'title');
+
+    // Parse banco
+    const tipoBanco = STATE.tipoBanco || BankParser.detectar(STATE.rawBanco, '');
+    STATE.tipoBanco = tipoBanco;
+    if (!tipoBanco) throw new Error('No se pudo detectar el banco. Verifica el archivo de cartola.');
+    const txs = BankParser.extraer(STATE.rawBanco, tipoBanco);
+    STATE.transacciones = txs;
+
+    // Parse ERP
+    const tipoERP = STATE.tipoERP || ERPParser.detectar(STATE.rawERP, '');
+    STATE.tipoERP = tipoERP;
+    if (!tipoERP) throw new Error('No se pudo detectar el ERP. Verifica el archivo de deuda.');
+    const deudas = ERPParser.extraer(STATE.rawERP, tipoERP);
+    STATE.deudas = deudas;
+
+    // Run engine
+    const resultados = Motor.ejecutar(txs, deudas, cid);
+    STATE.resultados = resultados;
+
+    updateBadges(cid);
+    renderResultados();
+    writeTerminal('✅ Motor finalizado. Revisa la tabla de resultados abajo.', 'success');
+
+  } catch(err) {
+    writeTerminal(`❌ Error en Motor: ${err.message}`, 'error');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="icon">⚡</span> Ejecutar Motor de Ingresos';
+  }
+}
+
+// ═══════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderComunidades();
+
+  // File inputs
+  document.getElementById('inp-erp').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    document.getElementById('lbl-erp').textContent = file.name;
+    try {
+      const wb = await readWorkbook(file);
+      STATE.rawERP = wb;
+      const tipo = ERPParser.detectar(wb, file.name);
+      STATE.tipoERP = tipo;
+      const tagEl = document.getElementById('tag-erp');
+      tagEl.innerHTML = tipo
+        ? `<span class="file-tag tag-erp">✓ ${DICCIONARIOS.erp[tipo].nombre}</span>`
+        : `<span class="file-tag tag-error">⚠ ERP no reconocido</span>`;
+    } catch(err) {
+      document.getElementById('tag-erp').innerHTML = `<span class="file-tag tag-error">❌ ${err.message}</span>`;
+    }
+  });
+
+  document.getElementById('inp-banco').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    document.getElementById('lbl-banco').textContent = file.name;
+    try {
+      const wb = await readWorkbook(file);
+      STATE.rawBanco = wb;
+      const tipo = BankParser.detectar(wb, file.name);
+      STATE.tipoBanco = tipo;
+      const tagEl = document.getElementById('tag-banco');
+      tagEl.innerHTML = tipo
+        ? `<span class="file-tag tag-banco">✓ ${DICCIONARIOS.bancos[tipo].nombre}</span>`
+        : `<span class="file-tag tag-error">⚠ Banco no reconocido</span>`;
+    } catch(err) {
+      document.getElementById('tag-banco').innerHTML = `<span class="file-tag tag-error">❌ ${err.message}</span>`;
+    }
+  });
+
+  // Community selector
+  document.getElementById('sel-comunidad').addEventListener('change', e => {
+    STATE.comunidadId = e.target.value;
+    updateBadges(e.target.value);
+  });
+
+  // Add community modal
+  document.getElementById('btn-add-com').addEventListener('click', () => {
+    document.getElementById('modal-comunidad').classList.add('open');
+  });
+  document.getElementById('modal-comunidad-cancel').addEventListener('click', () => {
+    document.getElementById('modal-comunidad').classList.remove('open');
+  });
+  document.getElementById('modal-comunidad-save').addEventListener('click', () => {
+    const nombre = document.getElementById('cm-nombre').value.trim();
+    if (!nombre) { alert('El nombre es obligatorio.'); return; }
+    const com = Comunidades.add({
+      nombre,
+      banco: document.getElementById('cm-banco').value,
+      erp: document.getElementById('cm-erp').value,
+      cuenta: document.getElementById('cm-cuenta').value,
+    });
+    renderComunidades();
+    document.getElementById('sel-comunidad').value = com.id;
+    STATE.comunidadId = com.id;
+    updateBadges(com.id);
+    document.getElementById('modal-comunidad').classList.remove('open');
+    // Reset form
+    ['cm-nombre','cm-banco','cm-erp','cm-cuenta'].forEach(id => { document.getElementById(id).value = ''; });
+  });
+
+  // Execute
+  document.getElementById('btn-execute').addEventListener('click', ejecutarMotor);
+
+  // Filter buttons
+  document.getElementById('filter-bar').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    STATE.filtroActivo = btn.dataset.filter;
+    renderResultados();
+  });
+
+  // Table actions (fix button)
+  document.getElementById('tbody-res').addEventListener('click', e => {
+    const btn = e.target.closest('.btn-fix');
+    if (!btn) return;
+    abrirModalMatch(btn.dataset.id);
+  });
+
+  // Manual match modal
+  document.getElementById('modal-match-cancel').addEventListener('click', () => {
+    document.getElementById('modal-match').classList.remove('open');
+  });
+  document.getElementById('match-search').addEventListener('input', e => {
+    renderDeudasList(e.target.value.toLowerCase());
+  });
+  document.getElementById('deudas-list').addEventListener('click', e => {
+    const opt = e.target.closest('.deuda-option');
+    if (!opt) return;
+    asignarManualmente(opt.dataset.did);
+  });
+
+  // Export
+  document.getElementById('btn-export').addEventListener('click', () => {
+    ExportEngine.exportar(STATE.resultados, STATE.mes);
+  });
+
+  // Guardar Memoria IA (bulk: learn all manual + conciliado)
+  document.getElementById('btn-aprender').addEventListener('click', () => {
+    if (!STATE.comunidadId) { alert('Selecciona una comunidad.'); return; }
+    let count = 0;
+    STATE.resultados.forEach(r => {
+      if ((r.estado === 'conciliado' || r.estado === 'sugerido') && r.deuda) {
+        MemoriaIA.aprender(r.descripcion, r.deuda.rut, r.deuda.propNorm, STATE.comunidadId);
+        count++;
+      }
+    });
+    writeTerminal(`🧠 Memoria IA: ${count} asociaciones guardadas para futuras conciliaciones.`, 'success');
+    updateBadges(STATE.comunidadId);
+  });
+
+  // Escudo Histórico
+  document.getElementById('btn-escudo').addEventListener('click', () => {
+    if (!STATE.comunidadId) { alert('Selecciona una comunidad.'); return; }
+    const hashes = STATE.resultados
+      .filter(r => r.estado === 'conciliado' || r.estado === 'sugerido')
+      .map(r => r.hash);
+    Escudo.add(STATE.comunidadId, hashes);
+    writeTerminal(`🛡️ Escudo: ${hashes.length} transacciones marcadas como conciliadas (no volverán a aparecer).`, 'success');
+    updateBadges(STATE.comunidadId);
+  });
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+});
+</script>
+</body>
+</html>
