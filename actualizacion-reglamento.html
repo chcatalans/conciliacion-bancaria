@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actualización Reglamento de Copropiedad — Ley 21.442</title>
+<style>
+  :root{
+    --bg:#f4f6fa; --panel:#ffffff; --ink:#1e2a3a; --muted:#64748b;
+    --brand:#1d4e89; --brand-2:#2d6cb5; --line:#e2e8f0;
+    --ok:#15803d; --ok-bg:#dcfce7;
+    --warn:#b45309; --warn-bg:#fef3c7;
+    --bad:#b91c1c; --bad-bg:#fee2e2;
+    --pend:#475569; --pend-bg:#e2e8f0;
+    --radius:12px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--ink); line-height:1.55;}
+  header{background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:#fff; padding:22px 28px;}
+  header h1{font-size:1.35rem; font-weight:700;}
+  header p{opacity:.85; font-size:.9rem; margin-top:4px;}
+  nav{display:flex; gap:4px; background:var(--panel); border-bottom:1px solid var(--line); padding:0 20px; overflow-x:auto; position:sticky; top:0; z-index:20;}
+  nav button{border:none; background:none; padding:14px 16px; font-size:.92rem; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap; font-weight:600;}
+  nav button:hover{color:var(--brand);}
+  nav button.active{color:var(--brand); border-bottom-color:var(--brand);}
+  main{max-width:1100px; margin:0 auto; padding:24px 20px 60px;}
+  section.tab{display:none;}
+  section.tab.active{display:block;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; margin-bottom:18px; box-shadow:0 1px 3px rgba(15,23,42,.05);}
+  .card h2{font-size:1.08rem; margin-bottom:12px; color:var(--brand);}
+  .card h3{font-size:.98rem; margin:14px 0 8px;}
+  .grid{display:grid; gap:14px;}
+  .grid.cols-2{grid-template-columns:repeat(auto-fit, minmax(280px,1fr));}
+  .grid.cols-4{grid-template-columns:repeat(auto-fit, minmax(160px,1fr));}
+  label{display:block; font-size:.83rem; font-weight:600; color:var(--muted); margin-bottom:4px;}
+  input[type=text], input[type=email], select, textarea{
+    width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:8px;
+    font-size:.92rem; font-family:inherit; background:#fff; color:var(--ink);
+  }
+  textarea{resize:vertical; min-height:88px;}
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--brand-2); outline-offset:0; border-color:var(--brand-2);}
+  .btn{display:inline-flex; align-items:center; gap:6px; border:none; border-radius:8px; padding:10px 18px; font-size:.9rem; font-weight:600; cursor:pointer; background:var(--brand); color:#fff;}
+  .btn:hover{background:var(--brand-2);}
+  .btn.secondary{background:#eef2f7; color:var(--brand);}
+  .btn.secondary:hover{background:#e2e8f0;}
+  .btn.danger{background:var(--bad);}
+  .btn.small{padding:6px 12px; font-size:.82rem;}
+  .btn.ok{background:var(--ok);}
+  .btn.warn{background:var(--warn);}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; text-align:center;}
+  .stat .num{font-size:1.9rem; font-weight:800;}
+  .stat .lbl{font-size:.8rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.03em;}
+  .stat.aprobado .num{color:var(--ok);}
+  .stat.revision .num{color:var(--warn);}
+  .stat.descartado .num{color:var(--bad);}
+  .stat.pendiente .num{color:var(--pend);}
+  .badge{display:inline-block; padding:3px 10px; border-radius:999px; font-size:.75rem; font-weight:700;}
+  .badge.pendiente{background:var(--pend-bg); color:var(--pend);}
+  .badge.aprobado{background:var(--ok-bg); color:var(--ok);}
+  .badge.revision{background:var(--warn-bg); color:var(--warn);}
+  .badge.descartado{background:var(--bad-bg); color:var(--bad);}
+  .comment-item{border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin-bottom:14px; background:var(--panel);}
+  .comment-item .head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+  .comment-item .meta{font-size:.8rem; color:var(--muted); margin-top:2px;}
+  .comment-item .body{margin-top:10px; font-size:.93rem; white-space:pre-wrap;}
+  .comment-item .propuesta{margin-top:8px; padding:10px 12px; background:#f8fafc; border-left:3px solid var(--brand-2); border-radius:0 8px 8px 0; font-size:.9rem; white-space:pre-wrap;}
+  .flag{margin-top:10px; padding:10px 12px; border-radius:8px; font-size:.85rem;}
+  .flag.alerta{background:var(--bad-bg); border-left:4px solid var(--bad);}
+  .flag.atencion{background:var(--warn-bg); border-left:4px solid var(--warn);}
+  .flag.info{background:#dbeafe; border-left:4px solid var(--brand-2);}
+  .flag b{display:block; margin-bottom:2px;}
+  .eval-box{margin-top:12px; padding:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:8px;}
+  .eval-final{margin-top:10px; padding:12px 14px; border-radius:8px; font-size:.88rem;}
+  .eval-final.aprobado{background:var(--ok-bg);}
+  .eval-final.revision{background:var(--warn-bg);}
+  .eval-final.descartado{background:var(--bad-bg);}
+  .doc-item{display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--line); border-radius:8px; margin-bottom:10px; flex-wrap:wrap;}
+  .doc-item .info{flex:1; min-width:200px;}
+  .doc-item .name{font-weight:600; font-size:.93rem;}
+  .doc-item .sub{font-size:.78rem; color:var(--muted);}
+  .filters{display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin-bottom:16px;}
+  .filters > div{min-width:170px;}
+  .empty{text-align:center; color:var(--muted); padding:34px 10px; font-size:.92rem;}
+  .legal-art{border-left:3px solid var(--brand); padding:10px 14px; margin-bottom:14px; background:#f8fafc; border-radius:0 8px 8px 0;}
+  .legal-art h4{font-size:.92rem; color:var(--brand); margin-bottom:4px;}
+  .legal-art p{font-size:.87rem;}
+  .legal-art .ref{font-size:.75rem; color:var(--muted); margin-top:4px; font-style:italic;}
+  .toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:12px 22px; border-radius:10px; font-size:.9rem; opacity:0; pointer-events:none; transition:opacity .3s; z-index:99;}
+  .toast.show{opacity:.95;}
+  .note{font-size:.82rem; color:var(--muted);}
+  .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  hr.sep{border:none; border-top:1px solid var(--line); margin:16px 0;}
+  @media print{
+    nav, .no-print, header p{display:none !important;}
+    body{background:#fff;}
+    .card, .comment-item{box-shadow:none; break-inside:avoid;}
+    section.tab{display:none;} section.tab.print-target{display:block !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚖️ Actualización de Reglamento de Copropiedad</h1>
+  <p>Ley N° 21.442 de Copropiedad Inmobiliaria y su Reglamento (D.S. N° 7, V. y U., publicado 09-ENE-2025) — Recepción y evaluación de comentarios de copropietarios</p>
+</header>
+
+<nav id="nav">
+  <button data-tab="inicio" class="active">🏠 Inicio</button>
+  <button data-tab="documentos">📄 Documentos</button>
+  <button data-tab="comentario">✍️ Nuevo comentario</button>
+  <button data-tab="revision">🔍 Revisión</button>
+  <button data-tab="legal">📚 Referencia legal</button>
+  <button data-tab="datos">💾 Datos</button>
+</nav>
+
+<main>
+
+<!-- ================= INICIO ================= -->
+<section class="tab active" id="tab-inicio">
+  <div class="card">
+    <h2>Comunidad</h2>
+    <div class="grid cols-2">
+      <div>
+        <label for="cfg-nombre">Nombre de la comunidad / condominio</label>
+        <input type="text" id="cfg-nombre" placeholder="Ej: Condominio Los Aromos">
+      </div>
+      <div>
+        <label for="cfg-plazo">Fecha límite para recibir comentarios</label>
+        <input type="text" id="cfg-plazo" placeholder="Ej: 31-08-2026">
+      </div>
+    </div>
+    <div class="actions no-print">
+      <button class="btn small" onclick="guardarConfig()">Guardar</button>
+    </div>
+  </div>
+
+  <div class="grid cols-4" id="stats">
+    <div class="stat pendiente"><div class="num" id="st-pendiente">0</div><div class="lbl">Pendientes</div></div>
+    <div class="stat aprobado"><div class="num" id="st-aprobado">0</div><div class="lbl">Aprobados</div></div>
+    <div class="stat revision"><div class="num" id="st-revision">0</div><div class="lbl">En revisión</div></div>
+    <div class="stat descartado"><div class="num" id="st-descartado">0</div><div class="lbl">Descartados</div></div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <h2>¿Cómo funciona este proceso?</h2>
+    <p style="font-size:.92rem;">
+      Las comunidades acogidas a la antigua Ley N° 19.537 deben <b>ajustar sus reglamentos de copropiedad</b> a la
+      Ley N° 21.442 (art. 100). Esta herramienta apoya ese proceso:
+    </p>
+    <ol style="font-size:.9rem; padding-left:22px; margin-top:8px;">
+      <li>El <b>operador</b> sube el reglamento antiguo de la comunidad y el borrador del nuevo reglamento (pestaña <b>Documentos</b>).</li>
+      <li>Los <b>copropietarios</b> envían sus comentarios y propuestas (pestaña <b>Nuevo comentario</b>). El sistema realiza un análisis automático preliminar de compatibilidad con la Ley 21.442 y el D.S. N° 7.</li>
+      <li>El <b>operador</b> evalúa cada comentario (pestaña <b>Revisión</b>) y lo clasifica en:
+        <span class="badge aprobado">Aprobado</span> se incorpora al nuevo reglamento ·
+        <span class="badge revision">En revisión</span> requiere análisis jurídico o de asamblea ·
+        <span class="badge descartado">Descartado</span> contraviene la ley o su reglamento.</li>
+      <li>El acuerdo final debe adoptarse en <b>asamblea extraordinaria</b> (o consulta por escrito, art. 15 Ley 21.442), reducirse a <b>escritura pública</b> e inscribirse en el Registro de Hipotecas y Gravámenes del Conservador de Bienes Raíces (art. 8 inciso final).</li>
+    </ol>
+  </div>
+
+  <div class="card no-print">
+    <h2>Informe</h2>
+    <p class="note">Genera un informe imprimible con todos los comentarios y su estado de evaluación.</p>
+    <div class="actions">
+      <button class="btn secondary" onclick="imprimirInforme()">🖨️ Imprimir informe de comentarios</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DOCUMENTOS ================= -->
+<section class="tab" id="tab-documentos">
+  <div class="card">
+    <h2>📄 Documentos de la comunidad</h2>
+    <p class="note">Suba aquí el <b>reglamento antiguo</b> de la comunidad (dictado bajo la Ley 19.537) y el <b>borrador</b> del nuevo reglamento en preparación. Los archivos quedan guardados localmente en este navegador (IndexedDB). Formatos aceptados: PDF, Word, texto e imágenes.</p>
+    <hr class="sep">
+    <div class="grid cols-2">
+      <div>
+        <h3>Reglamento antiguo</h3>
+        <input type="file" id="file-antiguo" accept=".pdf,.doc,.docx,.txt,.odt,.png,.jpg,.jpeg">
+        <div class="actions"><button class="btn small" onclick="subirDoc('antiguo')">⬆️ Subir reglamento antiguo</button></div>
+      </div>
+      <div>
+        <h3>Borrador nuevo reglamento</h3>
+        <input type="file" id="file-borrador" accept=".pdf,.doc,.docx,.txt,.odt,.png,.jpg,.jpeg">
+        <div class="actions"><button class="btn small" onclick="subirDoc('borrador')">⬆️ Subir borrador</button></div>
+      </div>
+    </div>
+    <hr class="sep">
+    <h3>Otros antecedentes (actas, planos, anexos)</h3>
+    <input type="file" id="file-otro">
+    <div class="actions"><button class="btn small secondary" onclick="subirDoc('otro')">⬆️ Subir antecedente</button></div>
+  </div>
+
+  <div class="card">
+    <h2>Archivo de documentos</h2>
+    <div id="lista-docs"></div>
+  </div>
+</section>
+
+<!-- ================= NUEVO COMENTARIO ================= -->
+<section class="tab" id="tab-comentario">
+  <div class="card">
+    <h2>✍️ Enviar comentario u observación al nuevo reglamento</h2>
+    <p class="note">Complete el formulario. Su comentario será evaluado conforme a la Ley N° 21.442 y al D.S. N° 7 de 2025 (V. y U.) para determinar si puede incorporarse al nuevo reglamento de copropiedad.</p>
+    <hr class="sep">
+    <div class="grid cols-2">
+      <div>
+        <label for="c-nombre">Nombre completo *</label>
+        <input type="text" id="c-nombre" placeholder="Nombre del copropietario">
+      </div>
+      <div>
+        <label for="c-unidad">Unidad (depto / casa / local) *</label>
+        <input type="text" id="c-unidad" placeholder="Ej: Depto 302, Torre B">
+      </div>
+      <div>
+        <label for="c-email">Correo electrónico</label>
+        <input type="email" id="c-email" placeholder="correo@ejemplo.cl">
+      </div>
+      <div>
+        <label for="c-rol">Calidad en que comparece</label>
+        <select id="c-rol">
+          <option value="Copropietario">Copropietario</option>
+          <option value="Arrendatario / ocupante">Arrendatario / ocupante</option>
+          <option value="Miembro comité de administración">Miembro comité de administración</option>
+          <option value="Administrador">Administrador</option>
+        </select>
+      </div>
+      <div>
+        <label for="c-tema">Materia del comentario</label>
+        <select id="c-tema">
+          <option>Mascotas y animales de compañía</option>
+          <option>Gastos comunes y fondo de reserva</option>
+          <option>Multas, infracciones y sanciones</option>
+          <option>Uso de bienes comunes</option>
+          <option>Arriendos temporales / hospedaje turístico</option>
+          <option>Asambleas y votaciones</option>
+          <option>Comité de administración / administrador</option>
+          <option>Estacionamientos</option>
+          <option>Seguridad y plan de emergencia</option>
+          <option>Normas de convivencia</option>
+          <option>Obras y modificaciones en unidades</option>
+          <option>Otra materia</option>
+        </select>
+      </div>
+      <div>
+        <label for="c-articulo">Artículo o cláusula del borrador al que se refiere (opcional)</label>
+        <input type="text" id="c-articulo" placeholder="Ej: Art. 24 del borrador">
+      </div>
+    </div>
+    <div style="margin-top:14px;">
+      <label for="c-comentario">Comentario u observación *</label>
+      <textarea id="c-comentario" placeholder="Describa su observación, inquietud o propuesta respecto del nuevo reglamento…"></textarea>
+    </div>
+    <div style="margin-top:14px;">
+      <label for="c-propuesta">Propuesta de redacción (opcional)</label>
+      <textarea id="c-propuesta" placeholder="Si tiene una redacción concreta para la cláusula, escríbala aquí…"></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="enviarComentario()">📨 Enviar comentario</button>
+      <button class="btn secondary" onclick="limpiarFormulario()">Limpiar</button>
+    </div>
+    <div id="analisis-previo"></div>
+  </div>
+</section>
+
+<!-- ================= REVISIÓN ================= -->
+<section class="tab" id="tab-revision">
+  <div class="card no-print">
+    <h2>🔍 Revisión y clasificación de comentarios</h2>
+    <p class="note">Evalúe cada comentario y decida: <span class="badge aprobado">Aprobado</span> (se incorpora al nuevo reglamento), <span class="badge revision">En revisión</span> (requiere análisis adicional o decisión de asamblea) o <span class="badge descartado">Descartado</span> (contraviene la Ley 21.442 o su reglamento). El análisis automático es <b>solo referencial</b> y no reemplaza la revisión jurídica.</p>
+    <hr class="sep">
+    <div class="filters">
+      <div>
+        <label for="f-estado">Estado</label>
+        <select id="f-estado" onchange="renderComentarios()">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="aprobado">Aprobados</option>
+          <option value="revision">En revisión</option>
+          <option value="descartado">Descartados</option>
+        </select>
+      </div>
+      <div>
+        <label for="f-tema">Materia</label>
+        <select id="f-tema" onchange="renderComentarios()"><option value="">Todas</option></select>
+      </div>
+      <div style="flex:1;">
+        <label for="f-texto">Buscar</label>
+        <input type="text" id="f-texto" placeholder="Nombre, unidad o texto…" oninput="renderComentarios()">
+      </div>
+    </div>
+  </div>
+  <div id="lista-comentarios"></div>
+</section>
+
+<!-- ================= LEGAL ================= -->
+<section class="tab" id="tab-legal">
+  <div class="card">
+    <h2>📚 Referencia legal para la evaluación de comentarios</h2>
+    <p class="note">Resumen de las disposiciones más relevantes para actualizar el reglamento de copropiedad. Fuentes: Ley N° 21.442 (D.O. 13-04-2022, con modificaciones de la Ley 21.508) y Reglamento de la Ley, D.S. N° 7 de 2023 del MINVU (D.O. 09-01-2025).</p>
+    <hr class="sep">
+
+    <h3>Obligación de actualizar</h3>
+    <div class="legal-art">
+      <h4>Art. 100 — Ley 21.442</h4>
+      <p>Se deroga la Ley 19.537. Las comunidades acogidas a ella se rigen por la Ley 21.442 desde su publicación, <b>debiendo ajustar sus reglamentos de copropiedad a sus disposiciones en el plazo de un año</b>. Los acuerdos anteriores de asambleas no quedan sin efecto.</p>
+    </div>
+
+    <h3>Contenido del reglamento de copropiedad</h3>
+    <div class="legal-art">
+      <h4>Art. 8 — Ley 21.442 (objetos del reglamento)</h4>
+      <p>El reglamento debe observar plenamente la Ley 20.609 (antidiscriminación) y, entre otros: a) fijar derechos y obligaciones recíprocos; b) imponer limitaciones que no sean contrarias a derechos legítimos — <b>no podrá prohibir la tenencia de mascotas y animales de compañía dentro de las unidades</b> (sí puede limitar su uso de bienes comunes); d) señalar derechos sobre bienes comunes y prorrateo de obligaciones económicas, incluido el recargo para el fondo común de reserva; e) administración y conservación de bienes comunes, multas e intereses; f) aprovechamiento de bienes comunes <b>sin discriminaciones arbitrarias</b>; g) bienes de uso y goce exclusivo; h) facultades del comité y del administrador; i) periodicidad de asambleas ordinarias; j) normas de convivencia y sanciones para <b>alojamiento temporal / hospedaje turístico</b> (apart-hotel y análogos); k) tipificar infracciones y sus multas o sanciones según gravedad; l) régimen administrativo. Debe constar en <b>escritura pública</b> e inscribirse en el Registro de Hipotecas y Gravámenes del CBR.</p>
+    </div>
+    <div class="legal-art">
+      <h4>Art. 9 — Ley 21.442 (primer reglamento)</h4>
+      <p>El primer reglamento o sus modificaciones <b>no podrán impedir el acceso de empresas de telecomunicaciones</b> ni pactar exclusividades con ellas (prohibición aplicable también a la asamblea, administrador y comité).</p>
+    </div>
+    <div class="legal-art">
+      <h4>Art. 10 — Ley 21.442 (nulidad)</h4>
+      <p><b>Son nulas absolutamente</b> las disposiciones del reglamento de copropiedad que no se ajusten a la ley, al reglamento de la ley o a las características propias del condominio. La nulidad puede ser total o parcial y la declara el tribunal.</p>
+    </div>
+    <div class="legal-art">
+      <h4>Art. 11 — Ley 21.442 / Art. 4 — D.S. 7</h4>
+      <p>El reglamento de la ley (D.S. 7) se aplica <b>supletoriamente</b> en todas las materias no reguladas por el reglamento de copropiedad del condominio.</p>
+    </div>
+
+    <h3>Aprobación de las modificaciones</h3>
+    <div class="legal-art">
+      <h4>Art. 15 — Ley 21.442 (asambleas y consulta por escrito)</h4>
+      <p>La modificación del reglamento de copropiedad es materia de <b>asamblea extraordinaria</b>, conforme a los quórums del cuadro del art. 15. Las materias también pueden acordarse mediante <b>consulta por escrito</b> con sesión informativa previa, remitiendo los antecedentes a los copropietarios; se aprueba con la aceptación escrita del quórum exigido, verificando fehacientemente la identidad (art. 17 D.S. 7). El acuerdo de modificación del reglamento debe <b>reducirse a escritura pública</b>. El reglamento puede autorizar la participación telemática en asambleas (requisitos en art. 16 D.S. 7).</p>
+    </div>
+    <div class="legal-art">
+      <h4>Art. 3 — D.S. 7 (inscripción)</h4>
+      <p>Las modificaciones al reglamento de copropiedad se inscriben en el <b>Registro de Hipotecas y Gravámenes del Conservador de Bienes Raíces</b> respectivo.</p>
+    </div>
+
+    <h3>Otras materias frecuentes en comentarios</h3>
+    <div class="legal-art">
+      <h4>Art. 10 — D.S. 7 (calidad de vida y arriendos temporales)</h4>
+      <p>El reglamento de copropiedad puede establecer <b>normas de convivencia y sanciones</b> para que el uso de unidades como alojamiento temporal u hospedaje turístico no afecte la calidad de vida de los residentes permanentes ni el uso de bienes y servicios comunes.</p>
+    </div>
+    <div class="legal-art">
+      <h4>Art. 5, 6 y 7 — D.S. 7 (registro de copropietarios)</h4>
+      <p>Registro obligatorio de copropietarios, arrendatarios y ocupantes, con deber de reserva de la información.</p>
+    </div>
+    <div class="legal-art">
+      <h4>Arts. 37 a 40 — D.S. 7 (seguro colectivo contra incendio)</h4>
+      <p>Regulan el pago de la prima, la contratación y los quórums del seguro colectivo contra incendio.</p>
+    </div>
+    <div class="legal-art">
+      <h4>Arts. 43 a 45 — D.S. 7 (estacionamientos)</h4>
+      <p>Estacionamientos de visitas, para personas con discapacidad y para bicicletas; asignación de uso y goce exclusivo.</p>
+    </div>
+    <div class="legal-art">
+      <h4>Ley 21.020 (tenencia responsable) y Ley 20.609 (antidiscriminación)</h4>
+      <p>Normas complementarias que el reglamento debe respetar: medidas especiales para caninos potencialmente peligrosos y prohibición de discriminación arbitraria.</p>
+    </div>
+    <p class="ref note" style="margin-top:10px;">Textos completos: <a href="https://bcn.cl/leychile" target="_blank" rel="noopener">Ley 21.442</a> · <a href="https://bcn.cl/v04ZVc" target="_blank" rel="noopener">D.S. N° 7 (Reglamento)</a></p>
+  </div>
+</section>
+
+<!-- ================= DATOS ================= -->
+<section class="tab" id="tab-datos">
+  <div class="card">
+    <h2>💾 Respaldo y administración de datos</h2>
+    <p class="note">Toda la información (configuración, comentarios y evaluaciones) se almacena localmente en este navegador mediante <b>IndexedDB</b>. Los documentos subidos también quedan en IndexedDB como archivos binarios. Use estas opciones para respaldar o migrar la información.</p>
+    <hr class="sep">
+    <div class="actions">
+      <button class="btn" onclick="exportarJSON()">⬇️ Exportar comentarios (JSON)</button>
+      <button class="btn secondary" onclick="document.getElementById('import-json').click()">⬆️ Importar comentarios (JSON)</button>
+      <input type="file" id="import-json" accept=".json" style="display:none" onchange="importarJSON(this)">
+      <button class="btn secondary" onclick="exportarCSV()">⬇️ Exportar comentarios (CSV)</button>
+    </div>
+    <hr class="sep">
+    <h3 style="color:var(--bad);">Zona de peligro</h3>
+    <div class="actions">
+      <button class="btn danger" onclick="borrarTodo()">🗑️ Borrar todos los datos</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   IndexedDB
+   ============================================================ */
+const DB_NAME = 'reglamento-copropiedad-db';
+const DB_VER = 1;
+let db = null;
+
+function abrirDB(){
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains('comentarios')){
+        const s = d.createObjectStore('comentarios', {keyPath:'id', autoIncrement:true});
+        s.createIndex('estado', 'estado');
+      }
+      if(!d.objectStoreNames.contains('documentos')){
+        d.createObjectStore('documentos', {keyPath:'id', autoIncrement:true});
+      }
+      if(!d.objectStoreNames.contains('config')){
+        d.createObjectStore('config', {keyPath:'clave'});
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = e => rej(e.target.error);
+  });
+}
+
+function tx(store, mode, fn){
+  return new Promise((res, rej) => {
+    const t = db.transaction(store, mode);
+    const s = t.objectStore(store);
+    const out = fn(s);
+    t.oncomplete = () => res(out && out.result !== undefined ? out.result : undefined);
+    t.onerror = e => rej(e.target.error);
+  });
+}
+
+function getAll(store){
+  return new Promise((res, rej) => {
+    const req = db.transaction(store, 'readonly').objectStore(store).getAll();
+    req.onsuccess = () => res(req.result);
+    req.onerror = e => rej(e.target.error);
+  });
+}
+
+/* ============================================================
+   Análisis legal automático (referencial)
+   ============================================================ */
+const REGLAS = [
+  {
+    re: /(prohib\w*|impedir|no\s+se\s+permit\w*|veta\w*)[^.]{0,80}(mascota|animal|perro|gato)|(mascota|animal|perro|gato)[^.]{0,80}(prohib\w*|impedir|no\s+se\s+permit\w*)/i,
+    nivel: 'alerta',
+    ref: 'Art. 8 letra b), Ley 21.442',
+    texto: 'La ley prohíbe expresamente que el reglamento de copropiedad prohíba la tenencia de mascotas y animales de compañía dentro de las unidades. Solo pueden establecerse limitaciones al uso de los bienes comunes por parte de dichos animales. Una propuesta de prohibición total debería DESCARTARSE o reformularse como restricción de uso de espacios comunes.'
+  },
+  {
+    re: /(mascota|animal|perro|gato)/i,
+    nivel: 'info',
+    ref: 'Art. 8 letra b), Ley 21.442 y Ley 21.020',
+    texto: 'Materia de mascotas: el reglamento puede regular el uso de bienes comunes por animales (correa, espacios, aseo) y aplicar las medidas de la Ley 21.020 para caninos potencialmente peligrosos, pero no puede prohibir su tenencia dentro de las unidades.'
+  },
+  {
+    re: /discrimin\w*/i,
+    nivel: 'alerta',
+    ref: 'Art. 8 letras b) y f), Ley 21.442 y Ley 20.609',
+    texto: 'El reglamento debe observar plenamente la Ley 20.609 (antidiscriminación). Son nulas las cláusulas que impliquen discriminación arbitraria, incluida la basada en condiciones laborales de copropietarios u ocupantes, aun en emergencias.'
+  },
+  {
+    re: /telecomunicacion|internet|fibra\s*[óo]ptica|antena|operador\s+de\s+(tv|televisi[óo]n|cable)/i,
+    nivel: 'atencion',
+    ref: 'Art. 9, Ley 21.442',
+    texto: 'El reglamento no puede impedir el acceso de empresas de telecomunicaciones ni pactar exclusividades con ellas. Cualquier cláusula en ese sentido debería descartarse.'
+  },
+  {
+    re: /(airbnb|arriendo\s+(temporal|tur[ií]stico|por\s+d[ií]a)|hospedaje|apart[\s-]?hotel|alojamiento\s+temporal)/i,
+    nivel: 'info',
+    ref: 'Art. 8 letra j), Ley 21.442 y Art. 10, D.S. 7',
+    texto: 'El reglamento puede (y debe) establecer normas de convivencia y sanciones para que el alojamiento temporal u hospedaje turístico no afecte la calidad de vida ni los bienes comunes. La regulación es admisible; una prohibición absoluta requiere análisis jurídico adicional.'
+  },
+  {
+    re: /(multa|sanci[óo]n|infracci[óo]n|inter[ée]s\s+penal)/i,
+    nivel: 'info',
+    ref: 'Art. 8 letras e) y k), Ley 21.442',
+    texto: 'El reglamento debe tipificar las conductas que constituyen infracciones y fijar las multas o sanciones aplicables, pudiendo graduarlas según gravedad. Materia admisible de regular.'
+  },
+  {
+    re: /(gasto\s+com[úu]n|fondo\s+(com[úu]n\s+)?de\s+reserva|prorrateo|alícuota|al[ií]cuota|cobranza)/i,
+    nivel: 'info',
+    ref: 'Arts. 6 y 8 letra d), Ley 21.442',
+    texto: 'El reglamento debe señalar la cuota de contribución de cada unidad a las obligaciones económicas y el porcentaje de recargo destinado al fondo común de reserva. Materia propia del reglamento.'
+  },
+  {
+    re: /(asamblea|votaci[óo]n|qu[óo]rum|quorum|consulta\s+por\s+escrito|telem[áa]tic\w*|videoconferencia|virtual)/i,
+    nivel: 'info',
+    ref: 'Art. 15, Ley 21.442 y Arts. 14 a 17, D.S. 7',
+    texto: 'Las asambleas, quórums y la consulta por escrito están regulados por la ley; el reglamento puede autorizar participación telemática cumpliendo los requisitos del D.S. 7. Los quórums legales no pueden rebajarse por reglamento.'
+  },
+  {
+    re: /estacionamiento/i,
+    nivel: 'info',
+    ref: 'Art. 60, Ley 21.442 y Arts. 43 a 45, D.S. 7',
+    texto: 'Estacionamientos de visitas, para personas con discapacidad y bicicletas tienen reglas legales específicas; el reglamento puede regular su asignación y uso dentro de ese marco.'
+  },
+  {
+    re: /(plan\s+de\s+emergencia|evacuaci[óo]n|incendio|seguro)/i,
+    nivel: 'info',
+    ref: 'Arts. 39 y ss., Ley 21.442 y Arts. 33 a 40, D.S. 7',
+    texto: 'El plan de emergencia y el seguro colectivo contra incendio son obligaciones legales; el reglamento puede complementarlas pero no eximirlas.'
+  },
+  {
+    re: /(administrador|comit[ée]\s+de\s+administraci[óo]n|subadministra\w*)/i,
+    nivel: 'info',
+    ref: 'Arts. 12 y ss., Ley 21.442 y Arts. 18 a 26, D.S. 7',
+    texto: 'El reglamento debe fijar facultades y obligaciones del comité de administración y del administrador, dentro del marco legal (designación, permanencia, rendición de cuentas).'
+  },
+  {
+    re: /(obra|ampliaci[óo]n|remodelaci[óo]n|modificaci[óo]n\s+de\s+fachada|cierre\s+de\s+terraza|cerramiento)/i,
+    nivel: 'info',
+    ref: 'Art. 15, Ley 21.442',
+    texto: 'Las alteraciones o ampliaciones de unidades pueden regularse en el reglamento; si están reguladas y no afectan derechos sobre bienes comunes, no requieren asamblea extraordinaria.'
+  }
+];
+
+function analizarTexto(txt){
+  const hallazgos = [];
+  const vistos = new Set();
+  for(const r of REGLAS){
+    if(r.re.test(txt) && !vistos.has(r.ref + r.nivel)){
+      // si ya hay una alerta de mascotas, omitir la regla informativa de mascotas
+      if(r.nivel === 'info' && /mascota|animal/i.test(r.re.source) && hallazgos.some(h => h.nivel === 'alerta' && /8 letra b\)/.test(h.ref))) continue;
+      hallazgos.push({nivel:r.nivel, ref:r.ref, texto:r.texto});
+      vistos.add(r.ref + r.nivel);
+    }
+  }
+  return hallazgos;
+}
+
+function sugerencia(hallazgos){
+  if(hallazgos.some(h => h.nivel === 'alerta')) return {estado:'descartado', txt:'El análisis automático detectó posibles conflictos directos con la Ley 21.442. Sugerencia: descartar o exigir reformulación.'};
+  if(hallazgos.some(h => h.nivel === 'atencion')) return {estado:'revision', txt:'El análisis automático detectó materias que requieren revisión jurídica antes de incorporarse.'};
+  if(hallazgos.length) return {estado:'aprobado', txt:'La materia es propia del reglamento de copropiedad y no se detectaron conflictos evidentes con la ley. Verifique la redacción antes de aprobar.'};
+  return {estado:'revision', txt:'No se identificó automáticamente la materia legal. Requiere revisión manual del operador.'};
+}
+
+/* ============================================================
+   UI: navegación y utilidades
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+document.getElementById('nav').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]');
+  if(!b) return;
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('active', x === b));
+  document.querySelectorAll('section.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + b.dataset.tab));
+  if(b.dataset.tab === 'revision') renderComentarios();
+  if(b.dataset.tab === 'documentos') renderDocs();
+  if(b.dataset.tab === 'inicio') renderStats();
+});
+
+let toastTimer = null;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fmtFecha(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
+}
+
+const ESTADOS = {pendiente:'Pendiente', aprobado:'Aprobado — se incorpora', revision:'En revisión', descartado:'Descartado'};
+
+/* ============================================================
+   Config
+   ============================================================ */
+async function cargarConfig(){
+  const items = await getAll('config');
+  const map = Object.fromEntries(items.map(i => [i.clave, i.valor]));
+  $('cfg-nombre').value = map.nombre || '';
+  $('cfg-plazo').value = map.plazo || '';
+}
+
+async function guardarConfig(){
+  await tx('config', 'readwrite', s => {
+    s.put({clave:'nombre', valor: $('cfg-nombre').value.trim()});
+    s.put({clave:'plazo', valor: $('cfg-plazo').value.trim()});
+  });
+  toast('✅ Configuración guardada');
+}
+
+/* ============================================================
+   Comentarios
+   ============================================================ */
+async function enviarComentario(){
+  const nombre = $('c-nombre').value.trim();
+  const unidad = $('c-unidad').value.trim();
+  const comentario = $('c-comentario').value.trim();
+  if(!nombre || !unidad || !comentario){
+    toast('⚠️ Complete nombre, unidad y comentario');
+    return;
+  }
+  const texto = comentario + ' ' + $('c-propuesta').value + ' ' + $('c-tema').value;
+  const flags = analizarTexto(texto);
+  const c = {
+    nombre, unidad,
+    email: $('c-email').value.trim(),
+    rol: $('c-rol').value,
+    tema: $('c-tema').value,
+    articulo: $('c-articulo').value.trim(),
+    comentario,
+    propuesta: $('c-propuesta').value.trim(),
+    fecha: new Date().toISOString(),
+    estado: 'pendiente',
+    flags,
+    evaluacion: null
+  };
+  await tx('comentarios', 'readwrite', s => s.add(c));
+
+  const sug = sugerencia(flags);
+  let html = '<div class="eval-box"><b>✅ Comentario recibido.</b> Análisis preliminar automático (referencial):';
+  html += flags.length
+    ? flags.map(f => `<div class="flag ${f.nivel}"><b>${esc(f.ref)}</b>${esc(f.texto)}</div>`).join('')
+    : '<div class="flag info">No se detectaron materias legales específicas; será revisado por el operador.</div>';
+  html += `<p class="note" style="margin-top:8px;">Clasificación sugerida: <span class="badge ${sug.estado}">${ESTADOS[sug.estado]}</span> — ${esc(sug.txt)}</p></div>`;
+  $('analisis-previo').innerHTML = html;
+
+  ['c-articulo','c-comentario','c-propuesta'].forEach(id => $(id).value = '');
+  renderStats();
+  toast('📨 Comentario enviado para evaluación');
+}
+
+function limpiarFormulario(){
+  ['c-nombre','c-unidad','c-email','c-articulo','c-comentario','c-propuesta'].forEach(id => $(id).value = '');
+  $('analisis-previo').innerHTML = '';
+}
+
+async function renderStats(){
+  const all = await getAll('comentarios');
+  const n = e => all.filter(c => c.estado === e).length;
+  $('st-pendiente').textContent = n('pendiente');
+  $('st-aprobado').textContent = n('aprobado');
+  $('st-revision').textContent = n('revision');
+  $('st-descartado').textContent = n('descartado');
+}
+
+function poblarFiltroTemas(){
+  const sel = $('f-tema');
+  const temas = [...document.querySelectorAll('#c-tema option')].map(o => o.value);
+  temas.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
+  });
+}
+
+async function renderComentarios(){
+  const cont = $('lista-comentarios');
+  let all = await getAll('comentarios');
+  all.sort((a,b) => (b.fecha||'').localeCompare(a.fecha||''));
+
+  const fe = $('f-estado').value, ft = $('f-tema').value, fx = $('f-texto').value.toLowerCase();
+  if(fe) all = all.filter(c => c.estado === fe);
+  if(ft) all = all.filter(c => c.tema === ft);
+  if(fx) all = all.filter(c => (c.nombre + ' ' + c.unidad + ' ' + c.comentario + ' ' + (c.propuesta||'')).toLowerCase().includes(fx));
+
+  if(!all.length){
+    cont.innerHTML = '<div class="card"><div class="empty">No hay comentarios que coincidan con el filtro.</div></div>';
+    return;
+  }
+
+  cont.innerHTML = all.map(c => {
+    const flagsHtml = (c.flags||[]).map(f => `<div class="flag ${f.nivel}"><b>${esc(f.ref)}</b>${esc(f.texto)}</div>`).join('');
+    const sug = sugerencia(c.flags||[]);
+    const evalHtml = c.evaluacion
+      ? `<div class="eval-final ${c.estado}"><b>Resolución del operador (${esc(c.evaluacion.evaluador||'operador')} — ${fmtFecha(c.evaluacion.fecha)}):</b><br>${esc(c.evaluacion.analisis)}${c.evaluacion.fundamento ? `<br><i>Fundamento legal: ${esc(c.evaluacion.fundamento)}</i>` : ''}</div>`
+      : '';
+    const formEval = c.estado === 'pendiente' || !c.evaluacion ? `
+      <div class="eval-box no-print">
+        <label>Análisis / resolución del operador</label>
+        <textarea id="ev-analisis-${c.id}" placeholder="Fundamento de la decisión…">${esc(c.evaluacion?.analisis||'')}</textarea>
+        <div class="grid cols-2" style="margin-top:8px;">
+          <div><label>Fundamento legal (artículo)</label><input type="text" id="ev-fund-${c.id}" placeholder="Ej: Art. 8 letra b) Ley 21.442" value="${esc(c.evaluacion?.fundamento||'')}"></div>
+          <div><label>Evaluador</label><input type="text" id="ev-eval-${c.id}" placeholder="Nombre del operador" value="${esc(c.evaluacion?.evaluador||'')}"></div>
+        </div>
+        <p class="note" style="margin-top:6px;">Sugerencia automática: <span class="badge ${sug.estado}">${ESTADOS[sug.estado]}</span></p>
+        <div class="actions">
+          <button class="btn small ok" onclick="resolver(${c.id},'aprobado')">✅ Aprobar e incorporar</button>
+          <button class="btn small warn" onclick="resolver(${c.id},'revision')">🔎 Dejar en revisión</button>
+          <button class="btn small danger" onclick="resolver(${c.id},'descartado')">🚫 Descartar</button>
+        </div>
+      </div>` : `
+      <div class="actions no-print">
+        <button class="btn small secondary" onclick="reabrir(${c.id})">↩️ Reabrir evaluación</button>
+        <button class="btn small danger" onclick="eliminarComentario(${c.id})">🗑️ Eliminar</button>
+      </div>`;
+
+    return `<div class="comment-item">
+      <div class="head">
+        <div>
+          <b>${esc(c.nombre)}</b> — ${esc(c.unidad)} <span class="note">(${esc(c.rol)})</span>
+          <div class="meta">📅 ${fmtFecha(c.fecha)} · 🏷️ ${esc(c.tema)}${c.articulo ? ' · 📌 ' + esc(c.articulo) : ''}${c.email ? ' · ✉️ ' + esc(c.email) : ''}</div>
+        </div>
+        <span class="badge ${c.estado}">${ESTADOS[c.estado]}</span>
+      </div>
+      <div class="body">${esc(c.comentario)}</div>
+      ${c.propuesta ? `<div class="propuesta"><b>Propuesta de redacción:</b><br>${esc(c.propuesta)}</div>` : ''}
+      ${flagsHtml}
+      ${evalHtml}
+      ${formEval}
+    </div>`;
+  }).join('');
+}
+
+async function resolver(id, estado){
+  const analisis = $(`ev-analisis-${id}`)?.value.trim() || '';
+  if(!analisis){
+    toast('⚠️ Escriba el análisis o fundamento de la decisión');
+    return;
+  }
+  const all = await getAll('comentarios');
+  const c = all.find(x => x.id === id);
+  if(!c) return;
+  c.estado = estado;
+  c.evaluacion = {
+    analisis,
+    fundamento: $(`ev-fund-${id}`)?.value.trim() || '',
+    evaluador: $(`ev-eval-${id}`)?.value.trim() || '',
+    fecha: new Date().toISOString()
+  };
+  await tx('comentarios', 'readwrite', s => s.put(c));
+  toast(`Comentario clasificado: ${ESTADOS[estado]}`);
+  renderComentarios();
+  renderStats();
+}
+
+async function reabrir(id){
+  const all = await getAll('comentarios');
+  const c = all.find(x => x.id === id);
+  if(!c) return;
+  c.estado = 'pendiente';
+  await tx('comentarios', 'readwrite', s => s.put(c));
+  renderComentarios();
+  renderStats();
+}
+
+async function eliminarComentario(id){
+  if(!confirm('¿Eliminar definitivamente este comentario?')) return;
+  await tx('comentarios', 'readwrite', s => s.delete(id));
+  renderComentarios();
+  renderStats();
+  toast('Comentario eliminado');
+}
+
+/* ============================================================
+   Documentos (blobs en IndexedDB)
+   ============================================================ */
+const TIPOS_DOC = {antiguo:'Reglamento antiguo', borrador:'Borrador nuevo reglamento', otro:'Antecedente'};
+
+async function subirDoc(tipo){
+  const input = $('file-' + tipo);
+  const f = input.files[0];
+  if(!f){ toast('⚠️ Seleccione un archivo primero'); return; }
+  const doc = {
+    tipo,
+    nombre: f.name,
+    mime: f.type || 'application/octet-stream',
+    tam: f.size,
+    fecha: new Date().toISOString(),
+    blob: f
+  };
+  await tx('documentos', 'readwrite', s => s.add(doc));
+  input.value = '';
+  renderDocs();
+  toast(`📄 ${TIPOS_DOC[tipo]} guardado en IndexedDB`);
+}
+
+function fmtBytes(n){
+  if(n < 1024) return n + ' B';
+  if(n < 1048576) return (n/1024).toFixed(1) + ' KB';
+  return (n/1048576).toFixed(1) + ' MB';
+}
+
+async function renderDocs(){
+  const docs = await getAll('documentos');
+  const cont = $('lista-docs');
+  if(!docs.length){
+    cont.innerHTML = '<div class="empty">Aún no hay documentos. Suba el reglamento antiguo y el borrador del nuevo reglamento.</div>';
+    return;
+  }
+  const orden = {antiguo:0, borrador:1, otro:2};
+  docs.sort((a,b) => (orden[a.tipo]-orden[b.tipo]) || a.fecha.localeCompare(b.fecha));
+  cont.innerHTML = docs.map(d => `
+    <div class="doc-item">
+      <div class="info">
+        <div class="name">${d.tipo === 'antiguo' ? '📜' : d.tipo === 'borrador' ? '📝' : '📎'} ${esc(d.nombre)}</div>
+        <div class="sub">${TIPOS_DOC[d.tipo]} · ${fmtBytes(d.tam)} · subido el ${fmtFecha(d.fecha)}</div>
+      </div>
+      <div class="actions" style="margin:0;">
+        <button class="btn small secondary" onclick="descargarDoc(${d.id}, false)">👁️ Ver</button>
+        <button class="btn small secondary" onclick="descargarDoc(${d.id}, true)">⬇️ Descargar</button>
+        <button class="btn small danger" onclick="eliminarDoc(${d.id})">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function descargarDoc(id, forzar){
+  const docs = await getAll('documentos');
+  const d = docs.find(x => x.id === id);
+  if(!d) return;
+  const url = URL.createObjectURL(d.blob);
+  if(forzar){
+    const a = document.createElement('a');
+    a.href = url; a.download = d.nombre;
+    a.click();
+  } else {
+    window.open(url, '_blank');
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+async function eliminarDoc(id){
+  if(!confirm('¿Eliminar este documento?')) return;
+  await tx('documentos', 'readwrite', s => s.delete(id));
+  renderDocs();
+  toast('Documento eliminado');
+}
+
+/* ============================================================
+   Exportar / importar / informe
+   ============================================================ */
+async function exportarJSON(){
+  const comentarios = await getAll('comentarios');
+  const config = await getAll('config');
+  const data = {app:'actualizacion-reglamento', version:1, exportado:new Date().toISOString(), config, comentarios};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'comentarios-reglamento-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('⬇️ Exportación JSON generada');
+}
+
+async function importarJSON(input){
+  const f = input.files[0];
+  if(!f) return;
+  try{
+    const data = JSON.parse(await f.text());
+    if(!Array.isArray(data.comentarios)) throw new Error('Formato inválido');
+    await tx('comentarios', 'readwrite', s => {
+      data.comentarios.forEach(c => { delete c.id; s.add(c); });
+    });
+    if(Array.isArray(data.config)){
+      await tx('config', 'readwrite', s => data.config.forEach(k => s.put(k)));
+      cargarConfig();
+    }
+    input.value = '';
+    renderStats();
+    renderComentarios();
+    toast(`⬆️ Importados ${data.comentarios.length} comentarios`);
+  }catch(e){
+    toast('❌ Archivo inválido: ' + e.message);
+  }
+}
+
+async function exportarCSV(){
+  const all = await getAll('comentarios');
+  const cab = ['Fecha','Nombre','Unidad','Rol','Email','Materia','Artículo ref.','Comentario','Propuesta','Estado','Análisis operador','Fundamento legal','Evaluador'];
+  const q = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
+  const filas = all.map(c => [
+    fmtFecha(c.fecha), c.nombre, c.unidad, c.rol, c.email, c.tema, c.articulo,
+    c.comentario, c.propuesta, ESTADOS[c.estado],
+    c.evaluacion?.analisis || '', c.evaluacion?.fundamento || '', c.evaluacion?.evaluador || ''
+  ].map(q).join(';'));
+  const csv = '﻿' + cab.map(q).join(';') + '\n' + filas.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'comentarios-reglamento-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('⬇️ Exportación CSV generada');
+}
+
+async function imprimirInforme(){
+  $('f-estado').value = ''; $('f-tema').value = ''; $('f-texto').value = '';
+  await renderComentarios();
+  document.querySelectorAll('section.tab').forEach(s => s.classList.remove('print-target'));
+  $('tab-revision').classList.add('print-target');
+  window.print();
+}
+
+async function borrarTodo(){
+  if(!confirm('Esto eliminará TODOS los comentarios, documentos y la configuración. ¿Continuar?')) return;
+  if(!confirm('Confirmación final: los datos no podrán recuperarse. ¿Borrar todo?')) return;
+  await tx('comentarios', 'readwrite', s => s.clear());
+  await tx('documentos', 'readwrite', s => s.clear());
+  await tx('config', 'readwrite', s => s.clear());
+  cargarConfig();
+  renderStats();
+  renderComentarios();
+  renderDocs();
+  toast('🗑️ Todos los datos fueron eliminados');
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+(async function init(){
+  await abrirDB();
+  poblarFiltroTemas();
+  await cargarConfig();
+  await renderStats();
+  await renderDocs();
+  await renderComentarios();
+})();
+</script>
+</body>
+</html>
