@@ -31,6 +31,7 @@
   .card h3{font-size:.98rem; margin:14px 0 8px;}
   .grid{display:grid; gap:14px;}
   .grid.cols-2{grid-template-columns:repeat(auto-fit, minmax(280px,1fr));}
+  .grid.cols-3{grid-template-columns:repeat(auto-fit, minmax(220px,1fr));}
   .grid.cols-4{grid-template-columns:repeat(auto-fit, minmax(160px,1fr));}
   label{display:block; font-size:.83rem; font-weight:600; color:var(--muted); margin-bottom:4px;}
   input[type=text], input[type=email], select, textarea{
@@ -38,6 +39,7 @@
     font-size:.92rem; font-family:inherit; background:#fff; color:var(--ink);
   }
   textarea{resize:vertical; min-height:88px;}
+  textarea.grande{min-height:180px;}
   input:focus, select:focus, textarea:focus{outline:2px solid var(--brand-2); outline-offset:0; border-color:var(--brand-2);}
   .btn{display:inline-flex; align-items:center; gap:6px; border:none; border-radius:8px; padding:10px 18px; font-size:.9rem; font-weight:600; cursor:pointer; background:var(--brand); color:#fff;}
   .btn:hover{background:var(--brand-2);}
@@ -62,8 +64,10 @@
   .comment-item{border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; margin-bottom:14px; background:var(--panel);}
   .comment-item .head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;}
   .comment-item .meta{font-size:.8rem; color:var(--muted); margin-top:2px;}
-  .comment-item .body{margin-top:10px; font-size:.93rem; white-space:pre-wrap;}
-  .comment-item .propuesta{margin-top:8px; padding:10px 12px; background:#f8fafc; border-left:3px solid var(--brand-2); border-radius:0 8px 8px 0; font-size:.9rem; white-space:pre-wrap;}
+  .comment-item .body{margin-top:10px; font-size:.9rem; white-space:pre-wrap; background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:10px 12px; max-height:260px; overflow:auto;}
+  .extraccion{margin-top:10px; padding:10px 12px; background:#eef2f7; border-radius:8px; font-size:.84rem;}
+  .extraccion b{color:var(--brand);}
+  .match-borrador{margin-top:10px; padding:10px 12px; background:#f0f9ff; border-left:3px solid var(--brand-2); border-radius:0 8px 8px 0; font-size:.86rem;}
   .flag{margin-top:10px; padding:10px 12px; border-radius:8px; font-size:.85rem;}
   .flag.alerta{background:var(--bad-bg); border-left:4px solid var(--bad);}
   .flag.atencion{background:var(--warn-bg); border-left:4px solid var(--warn);}
@@ -74,6 +78,7 @@
   .eval-final.aprobado{background:var(--ok-bg);}
   .eval-final.revision{background:var(--warn-bg);}
   .eval-final.descartado{background:var(--bad-bg);}
+  .eval-final.pendiente{background:var(--pend-bg);}
   .doc-item{display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--line); border-radius:8px; margin-bottom:10px; flex-wrap:wrap;}
   .doc-item .info{flex:1; min-width:200px;}
   .doc-item .name{font-weight:600; font-size:.93rem;}
@@ -84,17 +89,33 @@
   .legal-art{border-left:3px solid var(--brand); padding:10px 14px; margin-bottom:14px; background:#f8fafc; border-radius:0 8px 8px 0;}
   .legal-art h4{font-size:.92rem; color:var(--brand); margin-bottom:4px;}
   .legal-art p{font-size:.87rem;}
-  .legal-art .ref{font-size:.75rem; color:var(--muted); margin-top:4px; font-style:italic;}
   .toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:12px 22px; border-radius:10px; font-size:.9rem; opacity:0; pointer-events:none; transition:opacity .3s; z-index:99;}
   .toast.show{opacity:.95;}
   .note{font-size:.82rem; color:var(--muted);}
   .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
   hr.sep{border:none; border-top:1px solid var(--line); margin:16px 0;}
+
+  /* ===== Informe imprimible ===== */
+  #print-report{display:none;}
   @media print{
-    nav, .no-print, header p{display:none !important;}
+    header, nav, main, .toast{display:none !important;}
     body{background:#fff;}
-    .card, .comment-item{box-shadow:none; break-inside:avoid;}
-    section.tab{display:none;} section.tab.print-target{display:block !important;}
+    #print-report{display:block; padding:10px 4px; font-size:11pt; color:#111;}
+    #print-report h1{font-size:15pt; margin-bottom:2px;}
+    #print-report .sub{font-size:9.5pt; color:#555; margin-bottom:14px;}
+    #print-report h2{font-size:12.5pt; margin:18px 0 8px; padding-bottom:3px; border-bottom:2px solid #1d4e89; color:#1d4e89;}
+    #print-report table.resumen{border-collapse:collapse; width:100%; margin-bottom:6px;}
+    #print-report table.resumen th, #print-report table.resumen td{border:1px solid #bbb; padding:5px 9px; font-size:10pt; text-align:center;}
+    #print-report .pr-item{border:1px solid #ccc; border-radius:6px; padding:10px 12px; margin-bottom:10px; break-inside:avoid;}
+    #print-report .pr-item .quien{font-weight:700;}
+    #print-report .pr-item .datos{font-size:9pt; color:#555; margin:2px 0 6px;}
+    #print-report .pr-item .texto{font-size:9.5pt; white-space:pre-wrap; background:#f6f6f6; padding:6px 8px; border-radius:4px; max-height:none;}
+    #print-report .pr-item .dictamen{margin-top:6px; font-size:9.5pt; padding:6px 8px; border-radius:4px;}
+    #print-report .pr-item .dictamen.aprobado{background:#dcfce7;}
+    #print-report .pr-item .dictamen.revision{background:#fef3c7;}
+    #print-report .pr-item .dictamen.descartado{background:#fee2e2;}
+    #print-report .pr-item .dictamen.pendiente{background:#e2e8f0;}
+    #print-report .pie{margin-top:24px; font-size:8.5pt; color:#666; border-top:1px solid #ccc; padding-top:6px;}
   }
 </style>
 </head>
@@ -137,9 +158,9 @@
 
   <div class="grid cols-4" id="stats">
     <div class="stat pendiente"><div class="num" id="st-pendiente">0</div><div class="lbl">Pendientes</div></div>
-    <div class="stat aprobado"><div class="num" id="st-aprobado">0</div><div class="lbl">Aprobados</div></div>
-    <div class="stat revision"><div class="num" id="st-revision">0</div><div class="lbl">En revisión</div></div>
-    <div class="stat descartado"><div class="num" id="st-descartado">0</div><div class="lbl">Descartados</div></div>
+    <div class="stat aprobado"><div class="num" id="st-aprobado">0</div><div class="lbl">Corresponde</div></div>
+    <div class="stat revision"><div class="num" id="st-revision">0</div><div class="lbl">A revisar</div></div>
+    <div class="stat descartado"><div class="num" id="st-descartado">0</div><div class="lbl">No corresponde</div></div>
   </div>
 
   <div class="card" style="margin-top:18px;">
@@ -149,19 +170,19 @@
       Ley N° 21.442 (art. 100). Esta herramienta apoya ese proceso:
     </p>
     <ol style="font-size:.9rem; padding-left:22px; margin-top:8px;">
-      <li>El <b>operador</b> sube el reglamento antiguo de la comunidad y el borrador del nuevo reglamento (pestaña <b>Documentos</b>).</li>
-      <li>Los <b>copropietarios</b> envían sus comentarios y propuestas (pestaña <b>Nuevo comentario</b>). El sistema realiza un análisis automático preliminar de compatibilidad con la Ley 21.442 y el D.S. N° 7.</li>
-      <li>El <b>operador</b> evalúa cada comentario (pestaña <b>Revisión</b>) y lo clasifica en:
-        <span class="badge aprobado">Aprobado</span> se incorpora al nuevo reglamento ·
-        <span class="badge revision">En revisión</span> requiere análisis jurídico o de asamblea ·
-        <span class="badge descartado">Descartado</span> contraviene la ley o su reglamento.</li>
+      <li>El <b>operador</b> sube el reglamento antiguo, el borrador del nuevo reglamento y pega el <b>texto del borrador</b> para el análisis automático (pestaña <b>Documentos</b>).</li>
+      <li>Se registran los <b>correos de los residentes</b> con sus comentarios (pestaña <b>Nuevo comentario</b>): se pega el correo completo y el sistema extrae los datos, lo contrasta con el borrador y la Ley 21.442 / D.S. N° 7, y emite un dictamen:
+        <span class="badge aprobado">Corresponde</span> concuerda con el borrador y la ley ·
+        <span class="badge revision">A revisar</span> requiere análisis del operador ·
+        <span class="badge descartado">No corresponde</span> contraviene la ley.</li>
+      <li>El <b>operador</b> puede confirmar o corregir cada dictamen en la pestaña <b>Revisión</b>.</li>
       <li>El acuerdo final debe adoptarse en <b>asamblea extraordinaria</b> (o consulta por escrito, art. 15 Ley 21.442), reducirse a <b>escritura pública</b> e inscribirse en el Registro de Hipotecas y Gravámenes del Conservador de Bienes Raíces (art. 8 inciso final).</li>
     </ol>
   </div>
 
   <div class="card no-print">
     <h2>Informe</h2>
-    <p class="note">Genera un informe imprimible con todos los comentarios y su estado de evaluación.</p>
+    <p class="note">Genera un informe imprimible con todos los comentarios de los residentes, los datos extraídos de cada correo y su estado de evaluación.</p>
     <div class="actions">
       <button class="btn secondary" onclick="imprimirInforme()">🖨️ Imprimir informe de comentarios</button>
     </div>
@@ -193,6 +214,17 @@
   </div>
 
   <div class="card">
+    <h2>📝 Texto del borrador para el análisis automático</h2>
+    <p class="note">Pegue aquí el <b>texto completo del borrador</b> del nuevo reglamento (con sus artículos numerados: "Artículo 1...", "Artículo 2...", etc.). El sistema lo usa para contrastar cada correo recibido y determinar si el comentario <b>concuerda con algún artículo</b> del borrador. Si el archivo subido como borrador es de texto (.txt), puede cargarlo directamente con el botón.</p>
+    <textarea id="borrador-texto" class="grande" placeholder="Artículo 1: Del ámbito de aplicación...&#10;Artículo 2: De las definiciones...&#10;..."></textarea>
+    <div class="actions">
+      <button class="btn small" onclick="guardarBorradorTexto()">💾 Guardar texto del borrador</button>
+      <button class="btn small secondary" onclick="cargarBorradorDesdeArchivo()">📂 Cargar desde archivo borrador (.txt)</button>
+    </div>
+    <p class="note" id="borrador-estado" style="margin-top:8px;"></p>
+  </div>
+
+  <div class="card">
     <h2>Archivo de documentos</h2>
     <div id="lista-docs"></div>
   </div>
@@ -201,63 +233,29 @@
 <!-- ================= NUEVO COMENTARIO ================= -->
 <section class="tab" id="tab-comentario">
   <div class="card">
-    <h2>✍️ Enviar comentario u observación al nuevo reglamento</h2>
-    <p class="note">Complete el formulario. Su comentario será evaluado conforme a la Ley N° 21.442 y al D.S. N° 7 de 2025 (V. y U.) para determinar si puede incorporarse al nuevo reglamento de copropiedad.</p>
+    <h2>✍️ Registrar comentario de residente</h2>
+    <p class="note">Ingrese los datos del residente y <b>pegue el correo completo</b> que envió (incluyendo asunto, fecha y cuerpo del mensaje). El sistema extraerá la información del correo, la contrastará con el borrador del nuevo reglamento y con la Ley N° 21.442 / D.S. N° 7, y dictaminará si <b>corresponde</b>, <b>no corresponde</b> o <b>hay que revisarlo</b>.</p>
     <hr class="sep">
-    <div class="grid cols-2">
+    <div class="grid cols-3">
       <div>
         <label for="c-nombre">Nombre completo *</label>
-        <input type="text" id="c-nombre" placeholder="Nombre del copropietario">
+        <input type="text" id="c-nombre" placeholder="Nombre del residente">
       </div>
       <div>
         <label for="c-unidad">Unidad (depto / casa / local) *</label>
         <input type="text" id="c-unidad" placeholder="Ej: Depto 302, Torre B">
       </div>
       <div>
-        <label for="c-email">Correo electrónico</label>
+        <label for="c-email">Correo electrónico *</label>
         <input type="email" id="c-email" placeholder="correo@ejemplo.cl">
       </div>
-      <div>
-        <label for="c-rol">Calidad en que comparece</label>
-        <select id="c-rol">
-          <option value="Copropietario">Copropietario</option>
-          <option value="Arrendatario / ocupante">Arrendatario / ocupante</option>
-          <option value="Miembro comité de administración">Miembro comité de administración</option>
-          <option value="Administrador">Administrador</option>
-        </select>
-      </div>
-      <div>
-        <label for="c-tema">Materia del comentario</label>
-        <select id="c-tema">
-          <option>Mascotas y animales de compañía</option>
-          <option>Gastos comunes y fondo de reserva</option>
-          <option>Multas, infracciones y sanciones</option>
-          <option>Uso de bienes comunes</option>
-          <option>Arriendos temporales / hospedaje turístico</option>
-          <option>Asambleas y votaciones</option>
-          <option>Comité de administración / administrador</option>
-          <option>Estacionamientos</option>
-          <option>Seguridad y plan de emergencia</option>
-          <option>Normas de convivencia</option>
-          <option>Obras y modificaciones en unidades</option>
-          <option>Otra materia</option>
-        </select>
-      </div>
-      <div>
-        <label for="c-articulo">Artículo o cláusula del borrador al que se refiere (opcional)</label>
-        <input type="text" id="c-articulo" placeholder="Ej: Art. 24 del borrador">
-      </div>
     </div>
     <div style="margin-top:14px;">
-      <label for="c-comentario">Comentario u observación *</label>
-      <textarea id="c-comentario" placeholder="Describa su observación, inquietud o propuesta respecto del nuevo reglamento…"></textarea>
-    </div>
-    <div style="margin-top:14px;">
-      <label for="c-propuesta">Propuesta de redacción (opcional)</label>
-      <textarea id="c-propuesta" placeholder="Si tiene una redacción concreta para la cláusula, escríbala aquí…"></textarea>
+      <label for="c-comentario">Correo completo del residente * — pegue aquí el correo íntegro (De, Asunto, Fecha y el mensaje)</label>
+      <textarea id="c-comentario" class="grande" placeholder="De: residente@ejemplo.cl&#10;Asunto: Observación al nuevo reglamento&#10;Fecha: 10-07-2026&#10;&#10;Estimados, respecto del borrador del nuevo reglamento quisiera comentar que..."></textarea>
     </div>
     <div class="actions">
-      <button class="btn" onclick="enviarComentario()">📨 Enviar comentario</button>
+      <button class="btn" onclick="enviarComentario()">📨 Registrar y analizar correo</button>
       <button class="btn secondary" onclick="limpiarFormulario()">Limpiar</button>
     </div>
     <div id="analisis-previo"></div>
@@ -268,7 +266,7 @@
 <section class="tab" id="tab-revision">
   <div class="card no-print">
     <h2>🔍 Revisión y clasificación de comentarios</h2>
-    <p class="note">Evalúe cada comentario y decida: <span class="badge aprobado">Aprobado</span> (se incorpora al nuevo reglamento), <span class="badge revision">En revisión</span> (requiere análisis adicional o decisión de asamblea) o <span class="badge descartado">Descartado</span> (contraviene la Ley 21.442 o su reglamento). El análisis automático es <b>solo referencial</b> y no reemplaza la revisión jurídica.</p>
+    <p class="note">El sistema dictamina automáticamente cada correo: <span class="badge aprobado">Corresponde</span> (concuerda con el borrador y la ley; se incorpora), <span class="badge revision">A revisar</span> (requiere análisis del operador) o <span class="badge descartado">No corresponde</span> (contraviene la Ley 21.442 o su reglamento). El dictamen automático es <b>referencial</b>: el operador puede reabrirlo y corregirlo. No reemplaza la revisión jurídica.</p>
     <hr class="sep">
     <div class="filters">
       <div>
@@ -276,9 +274,9 @@
         <select id="f-estado" onchange="renderComentarios()">
           <option value="">Todos</option>
           <option value="pendiente">Pendientes</option>
-          <option value="aprobado">Aprobados</option>
-          <option value="revision">En revisión</option>
-          <option value="descartado">Descartados</option>
+          <option value="aprobado">Corresponde</option>
+          <option value="revision">A revisar</option>
+          <option value="descartado">No corresponde</option>
         </select>
       </div>
       <div>
@@ -356,7 +354,7 @@
       <h4>Ley 21.020 (tenencia responsable) y Ley 20.609 (antidiscriminación)</h4>
       <p>Normas complementarias que el reglamento debe respetar: medidas especiales para caninos potencialmente peligrosos y prohibición de discriminación arbitraria.</p>
     </div>
-    <p class="ref note" style="margin-top:10px;">Textos completos: <a href="https://bcn.cl/leychile" target="_blank" rel="noopener">Ley 21.442</a> · <a href="https://bcn.cl/v04ZVc" target="_blank" rel="noopener">D.S. N° 7 (Reglamento)</a></p>
+    <p class="note" style="margin-top:10px;">Textos completos: <a href="https://bcn.cl/leychile" target="_blank" rel="noopener">Ley 21.442</a> · <a href="https://bcn.cl/v04ZVc" target="_blank" rel="noopener">D.S. N° 7 (Reglamento)</a></p>
   </div>
 </section>
 
@@ -364,7 +362,7 @@
 <section class="tab" id="tab-datos">
   <div class="card">
     <h2>💾 Respaldo y administración de datos</h2>
-    <p class="note">Toda la información (configuración, comentarios y evaluaciones) se almacena localmente en este navegador mediante <b>IndexedDB</b>. Los documentos subidos también quedan en IndexedDB como archivos binarios. Use estas opciones para respaldar o migrar la información.</p>
+    <p class="note">Toda la información (configuración, comentarios, evaluaciones y texto del borrador) se almacena localmente en este navegador mediante <b>IndexedDB</b>. Los documentos subidos también quedan en IndexedDB como archivos binarios. Use estas opciones para respaldar o migrar la información.</p>
     <hr class="sep">
     <div class="actions">
       <button class="btn" onclick="exportarJSON()">⬇️ Exportar comentarios (JSON)</button>
@@ -381,6 +379,9 @@
 </section>
 
 </main>
+
+<!-- Informe imprimible (se llena al momento de imprimir) -->
+<div id="print-report"></div>
 
 <div class="toast" id="toast"></div>
 
@@ -434,7 +435,7 @@ function getAll(store){
 }
 
 /* ============================================================
-   Análisis legal automático (referencial)
+   Reglas legales (Ley 21.442 / D.S. 7) — análisis referencial
    ============================================================ */
 const REGLAS = [
   {
@@ -516,7 +517,6 @@ function analizarTexto(txt){
   const vistos = new Set();
   for(const r of REGLAS){
     if(r.re.test(txt) && !vistos.has(r.ref + r.nivel)){
-      // si ya hay una alerta de mascotas, omitir la regla informativa de mascotas
       if(r.nivel === 'info' && /mascota|animal/i.test(r.re.source) && hallazgos.some(h => h.nivel === 'alerta' && /8 letra b\)/.test(h.ref))) continue;
       hallazgos.push({nivel:r.nivel, ref:r.ref, texto:r.texto});
       vistos.add(r.ref + r.nivel);
@@ -525,11 +525,145 @@ function analizarTexto(txt){
   return hallazgos;
 }
 
-function sugerencia(hallazgos){
-  if(hallazgos.some(h => h.nivel === 'alerta')) return {estado:'descartado', txt:'El análisis automático detectó posibles conflictos directos con la Ley 21.442. Sugerencia: descartar o exigir reformulación.'};
-  if(hallazgos.some(h => h.nivel === 'atencion')) return {estado:'revision', txt:'El análisis automático detectó materias que requieren revisión jurídica antes de incorporarse.'};
-  if(hallazgos.length) return {estado:'aprobado', txt:'La materia es propia del reglamento de copropiedad y no se detectaron conflictos evidentes con la ley. Verifique la redacción antes de aprobar.'};
-  return {estado:'revision', txt:'No se identificó automáticamente la materia legal. Requiere revisión manual del operador.'};
+/* ============================================================
+   Detección de materia (para filtros e informe)
+   ============================================================ */
+const TEMAS = [
+  {nombre:'Mascotas y animales de compañía', re:/(mascota|animal|perro|gato)/i},
+  {nombre:'Arriendos temporales / hospedaje turístico', re:/(airbnb|arriendo\s+(temporal|tur[ií]stico)|hospedaje|apart[\s-]?hotel|alojamiento\s+temporal)/i},
+  {nombre:'Gastos comunes y fondo de reserva', re:/(gasto\s+com[úu]n|fondo\s+de\s+reserva|prorrateo|al[ií]cuota|cobranza|morosidad)/i},
+  {nombre:'Multas, infracciones y sanciones', re:/(multa|sanci[óo]n|infracci[óo]n)/i},
+  {nombre:'Asambleas y votaciones', re:/(asamblea|votaci[óo]n|qu[óo]rum|quorum|consulta\s+por\s+escrito)/i},
+  {nombre:'Estacionamientos', re:/estacionamiento/i},
+  {nombre:'Seguridad y plan de emergencia', re:/(plan\s+de\s+emergencia|evacuaci[óo]n|incendio|seguro|c[áa]mara)/i},
+  {nombre:'Comité de administración / administrador', re:/(administrador|comit[ée])/i},
+  {nombre:'Obras y modificaciones en unidades', re:/(obra|ampliaci[óo]n|remodelaci[óo]n|cerramiento|terraza)/i},
+  {nombre:'Uso de bienes comunes', re:/(quincho|piscina|ascensor|bien(es)?\s+com[úu]n|[áa]reas?\s+comunes|espacio\s+com[úu]n)/i},
+  {nombre:'Normas de convivencia', re:/(ruido|convivencia|fiesta|horario|molestia)/i},
+];
+
+function detectarTema(txt){
+  for(const t of TEMAS) if(t.re.test(txt)) return t.nombre;
+  return 'Otra materia';
+}
+
+/* ============================================================
+   Extracción de datos del correo pegado
+   ============================================================ */
+function extraerCorreo(txt){
+  const g = re => { const m = txt.match(re); return m ? m[1].trim() : ''; };
+  return {
+    remitente: g(/^[>\s]*(?:de|from)\s*:\s*(.+)$/im),
+    asunto:    g(/^[>\s]*(?:asunto|subject|ref)\s*:\s*(.+)$/im),
+    fechaCorreo: g(/^[>\s]*(?:fecha|date|enviado(?:\s+el)?)\s*:\s*(.+)$/im),
+    para:      g(/^[>\s]*(?:para|to)\s*:\s*(.+)$/im),
+    articulosCitados: [...new Set(
+      [...txt.matchAll(/art(?:[íi]culo|\.)\s*(?:n[°º]?\s*)?(\d{1,3})/gi)].map(m => +m[1])
+    )]
+  };
+}
+
+/* ============================================================
+   Contraste con el texto del borrador
+   ============================================================ */
+let borradorArticulos = []; // cache en memoria; fuente de verdad: config.borradorTexto
+
+function parseArticulosBorrador(texto){
+  const arts = [];
+  const re = /art[íi]culo\s+(?:n[°º]?\s*)?(\d{1,3})[°º]?\s*[.:\-–]?/gi;
+  let m, prev = null;
+  while((m = re.exec(texto))){
+    if(prev) prev.texto = texto.slice(prev.fin, m.index).trim();
+    prev = {num:+m[1], fin: re.lastIndex, texto:''};
+    arts.push(prev);
+  }
+  if(prev) prev.texto = texto.slice(prev.fin).trim();
+  return arts.filter(a => a.texto.length > 20);
+}
+
+function normalizar(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+const STOP = new Set(('para,pero,como,esta,este,estos,estas,donde,cuando,sobre,entre,tiene,tienen,sean,sera,seran,desde,hasta,' +
+  'cada,ellos,ellas,todo,toda,todos,todas,unidad,unidades,condominio,reglamento,articulo,articulos,podra,podran,debera,deberan,' +
+  'caso,casos,dicho,dicha,parte,manera,forma,respecto,demas,segun,tambien,cualquier,estimado,estimada,estimados,saludos,' +
+  'atentamente,junto,hola,buenos,buenas,dias,tardes,noches,correo,asunto,fecha,quisiera,solicito,propongo,sugiero,comentar,' +
+  'nuevo,nueva,borrador,comunidad,señores,senores,cordialmente,gracias,favor,mediante,deben,puede,pueden,haber,hacer,tener').split(','));
+
+function contrastarConBorrador(comentario, articulosCitados){
+  if(!borradorArticulos.length) return null;
+  // 1) Si el correo cita un artículo que existe en el borrador, usarlo.
+  for(const n of articulosCitados){
+    const a = borradorArticulos.find(x => x.num === n);
+    if(a) return {num:a.num, extracto: a.texto.slice(0,320), motivo:'citado', score:99};
+  }
+  // 2) Similitud por palabras clave entre el correo y cada artículo.
+  const toks = [...new Set(normalizar(comentario).match(/[a-zñ]{5,}/g) || [])].filter(w => !STOP.has(w));
+  if(!toks.length) return null;
+  let best = null;
+  for(const a of borradorArticulos){
+    const na = normalizar(a.texto);
+    let s = 0;
+    for(const t of toks) if(na.includes(t)) s++;
+    if(!best || s > best.score) best = {num:a.num, extracto:a.texto.slice(0,320), motivo:'similitud', score:s};
+  }
+  return best && best.score >= 3 ? best : null;
+}
+
+/* ============================================================
+   Dictamen automático: corresponde / no corresponde / revisar
+   ============================================================ */
+function dictaminar(flags, match){
+  const alerta = flags.find(f => f.nivel === 'alerta');
+  if(alerta){
+    return {
+      estado:'descartado',
+      titulo:'NO CORRESPONDE',
+      detalle:'La solicitud del residente contraviene disposiciones de la Ley 21.442 o su reglamento, por lo que no puede incorporarse al nuevo reglamento de copropiedad en los términos planteados. ' + alerta.texto,
+      fundamento: alerta.ref
+    };
+  }
+  const atencion = flags.find(f => f.nivel === 'atencion');
+  if(atencion){
+    return {
+      estado:'revision',
+      titulo:'HAY QUE REVISARLO',
+      detalle:'El correo trata una materia con restricciones legales que exigen revisión jurídica antes de resolver. ' + atencion.texto,
+      fundamento: atencion.ref
+    };
+  }
+  const info = flags.find(f => f.nivel === 'info');
+  if(match){
+    return {
+      estado:'aprobado',
+      titulo:'CORRESPONDE',
+      detalle:`El comentario concuerda con el Artículo ${match.num} del borrador del nuevo reglamento (${match.motivo === 'citado' ? 'citado expresamente en el correo' : 'coincidencia de contenido'}) y la materia es propia del reglamento de copropiedad, sin conflictos evidentes con la Ley 21.442. Se sugiere incorporarlo / tenerlo por recogido en dicho artículo.`,
+      fundamento: (info ? info.ref + ' · ' : '') + `Artículo ${match.num} del borrador`
+    };
+  }
+  if(!borradorArticulos.length){
+    return {
+      estado:'revision',
+      titulo:'HAY QUE REVISARLO',
+      detalle:'No hay texto del borrador cargado para contrastar (pestaña Documentos → "Texto del borrador"). ' + (info ? 'La materia es admisible de regular: ' + info.texto : 'Requiere revisión manual del operador.'),
+      fundamento: info ? info.ref : ''
+    };
+  }
+  if(info){
+    return {
+      estado:'revision',
+      titulo:'HAY QUE REVISARLO',
+      detalle:'La materia es propia del reglamento de copropiedad, pero no se encontró un artículo del borrador que la recoja. Debe evaluarse si se agrega una nueva cláusula al borrador. ' + info.texto,
+      fundamento: info.ref
+    };
+  }
+  return {
+    estado:'revision',
+    titulo:'HAY QUE REVISARLO',
+    detalle:'No se identificó automáticamente la materia legal ni un artículo del borrador relacionado. Requiere revisión manual del operador.',
+    fundamento:''
+  };
 }
 
 /* ============================================================
@@ -566,16 +700,19 @@ function fmtFecha(iso){
   return d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
 }
 
-const ESTADOS = {pendiente:'Pendiente', aprobado:'Aprobado — se incorpora', revision:'En revisión', descartado:'Descartado'};
+const ESTADOS = {pendiente:'Pendiente', aprobado:'Corresponde — se incorpora', revision:'A revisar', descartado:'No corresponde'};
 
 /* ============================================================
-   Config
+   Config y texto del borrador
    ============================================================ */
 async function cargarConfig(){
   const items = await getAll('config');
   const map = Object.fromEntries(items.map(i => [i.clave, i.valor]));
   $('cfg-nombre').value = map.nombre || '';
   $('cfg-plazo').value = map.plazo || '';
+  $('borrador-texto').value = map.borradorTexto || '';
+  borradorArticulos = parseArticulosBorrador(map.borradorTexto || '');
+  actualizarEstadoBorrador();
 }
 
 async function guardarConfig(){
@@ -586,49 +723,94 @@ async function guardarConfig(){
   toast('✅ Configuración guardada');
 }
 
+function actualizarEstadoBorrador(){
+  const el = $('borrador-estado');
+  el.textContent = borradorArticulos.length
+    ? `✅ Borrador cargado: ${borradorArticulos.length} artículos detectados (${borradorArticulos.map(a => a.num).join(', ')}). Los correos nuevos se contrastarán contra este texto.`
+    : '⚠️ Sin texto de borrador: los correos no podrán contrastarse con los artículos y quedarán "A revisar".';
+}
+
+async function guardarBorradorTexto(){
+  const texto = $('borrador-texto').value;
+  await tx('config', 'readwrite', s => s.put({clave:'borradorTexto', valor: texto}));
+  borradorArticulos = parseArticulosBorrador(texto);
+  actualizarEstadoBorrador();
+  toast(borradorArticulos.length
+    ? `💾 Borrador guardado: ${borradorArticulos.length} artículos detectados`
+    : '💾 Guardado, pero no se detectaron artículos numerados ("Artículo N: ...")');
+}
+
+async function cargarBorradorDesdeArchivo(){
+  const docs = await getAll('documentos');
+  const cand = docs.filter(d => d.tipo === 'borrador' && (d.mime.startsWith('text/') || /\.txt$/i.test(d.nombre)))
+                   .sort((a,b) => b.fecha.localeCompare(a.fecha))[0];
+  if(!cand){
+    toast('⚠️ No hay archivo borrador de texto (.txt) subido. Para PDF/Word, copie y pegue el texto manualmente.');
+    return;
+  }
+  $('borrador-texto').value = await cand.blob.text();
+  await guardarBorradorTexto();
+}
+
 /* ============================================================
-   Comentarios
+   Comentarios (correos de residentes)
    ============================================================ */
 async function enviarComentario(){
   const nombre = $('c-nombre').value.trim();
   const unidad = $('c-unidad').value.trim();
+  const email = $('c-email').value.trim();
   const comentario = $('c-comentario').value.trim();
-  if(!nombre || !unidad || !comentario){
-    toast('⚠️ Complete nombre, unidad y comentario');
+  if(!nombre || !unidad || !email || !comentario){
+    toast('⚠️ Complete nombre, unidad, correo electrónico y pegue el correo completo');
     return;
   }
-  const texto = comentario + ' ' + $('c-propuesta').value + ' ' + $('c-tema').value;
-  const flags = analizarTexto(texto);
+  const correoDatos = extraerCorreo(comentario);
+  const flags = analizarTexto(comentario);
+  const match = contrastarConBorrador(comentario, correoDatos.articulosCitados);
+  const dictamen = dictaminar(flags, match);
+
   const c = {
-    nombre, unidad,
-    email: $('c-email').value.trim(),
-    rol: $('c-rol').value,
-    tema: $('c-tema').value,
-    articulo: $('c-articulo').value.trim(),
+    nombre, unidad, email,
+    tema: detectarTema(comentario),
     comentario,
-    propuesta: $('c-propuesta').value.trim(),
+    correoDatos,
+    borradorMatch: match,
     fecha: new Date().toISOString(),
-    estado: 'pendiente',
+    estado: dictamen.estado,
     flags,
-    evaluacion: null
+    evaluacion: {
+      analisis: dictamen.detalle,
+      fundamento: dictamen.fundamento,
+      evaluador: 'Sistema (análisis automático)',
+      fecha: new Date().toISOString()
+    },
+    dictamenAuto: dictamen
   };
   await tx('comentarios', 'readwrite', s => s.add(c));
 
-  const sug = sugerencia(flags);
-  let html = '<div class="eval-box"><b>✅ Comentario recibido.</b> Análisis preliminar automático (referencial):';
-  html += flags.length
-    ? flags.map(f => `<div class="flag ${f.nivel}"><b>${esc(f.ref)}</b>${esc(f.texto)}</div>`).join('')
-    : '<div class="flag info">No se detectaron materias legales específicas; será revisado por el operador.</div>';
-  html += `<p class="note" style="margin-top:8px;">Clasificación sugerida: <span class="badge ${sug.estado}">${ESTADOS[sug.estado]}</span> — ${esc(sug.txt)}</p></div>`;
+  let html = `<div class="eval-box"><b>✅ Correo registrado.</b> Dictamen automático (referencial):`;
+  html += `<div class="eval-final ${dictamen.estado}" style="margin-top:8px;"><b><span class="badge ${dictamen.estado}">${dictamen.titulo}</span></b><br>${esc(dictamen.detalle)}${dictamen.fundamento ? `<br><i>Fundamento: ${esc(dictamen.fundamento)}</i>` : ''}</div>`;
+  html += `<div class="extraccion" style="margin-top:8px;"><b>Datos extraídos del correo:</b> `
+    + (correoDatos.remitente ? `De: ${esc(correoDatos.remitente)} · ` : '')
+    + (correoDatos.asunto ? `Asunto: ${esc(correoDatos.asunto)} · ` : '')
+    + (correoDatos.fechaCorreo ? `Fecha: ${esc(correoDatos.fechaCorreo)} · ` : '')
+    + `Materia detectada: ${esc(c.tema)}`
+    + (correoDatos.articulosCitados.length ? ` · Artículos citados: ${correoDatos.articulosCitados.join(', ')}` : '')
+    + `</div>`;
+  if(match){
+    html += `<div class="match-borrador"><b>📌 Coincidencia en el borrador — Artículo ${match.num}</b> (${match.motivo === 'citado' ? 'citado en el correo' : 'por similitud de contenido'}):<br>«${esc(match.extracto)}…»</div>`;
+  }
+  html += flags.map(f => `<div class="flag ${f.nivel}"><b>${esc(f.ref)}</b>${esc(f.texto)}</div>`).join('');
+  html += `<p class="note" style="margin-top:8px;">El operador puede confirmar o corregir este dictamen en la pestaña <b>Revisión</b>.</p></div>`;
   $('analisis-previo').innerHTML = html;
 
-  ['c-articulo','c-comentario','c-propuesta'].forEach(id => $(id).value = '');
+  $('c-comentario').value = '';
   renderStats();
-  toast('📨 Comentario enviado para evaluación');
+  toast(`📨 Correo registrado — Dictamen: ${dictamen.titulo}`);
 }
 
 function limpiarFormulario(){
-  ['c-nombre','c-unidad','c-email','c-articulo','c-comentario','c-propuesta'].forEach(id => $(id).value = '');
+  ['c-nombre','c-unidad','c-email','c-comentario'].forEach(id => $(id).value = '');
   $('analisis-previo').innerHTML = '';
 }
 
@@ -643,8 +825,7 @@ async function renderStats(){
 
 function poblarFiltroTemas(){
   const sel = $('f-tema');
-  const temas = [...document.querySelectorAll('#c-tema option')].map(o => o.value);
-  temas.forEach(t => {
+  [...TEMAS.map(t => t.nombre), 'Otra materia'].forEach(t => {
     const o = document.createElement('option');
     o.value = t; o.textContent = t;
     sel.appendChild(o);
@@ -659,7 +840,7 @@ async function renderComentarios(){
   const fe = $('f-estado').value, ft = $('f-tema').value, fx = $('f-texto').value.toLowerCase();
   if(fe) all = all.filter(c => c.estado === fe);
   if(ft) all = all.filter(c => c.tema === ft);
-  if(fx) all = all.filter(c => (c.nombre + ' ' + c.unidad + ' ' + c.comentario + ' ' + (c.propuesta||'')).toLowerCase().includes(fx));
+  if(fx) all = all.filter(c => (c.nombre + ' ' + c.unidad + ' ' + c.comentario).toLowerCase().includes(fx));
 
   if(!all.length){
     cont.innerHTML = '<div class="card"><div class="empty">No hay comentarios que coincidan con el filtro.</div></div>';
@@ -667,41 +848,52 @@ async function renderComentarios(){
   }
 
   cont.innerHTML = all.map(c => {
-    const flagsHtml = (c.flags||[]).map(f => `<div class="flag ${f.nivel}"><b>${esc(f.ref)}</b>${esc(f.texto)}</div>`).join('');
-    const sug = sugerencia(c.flags||[]);
-    const evalHtml = c.evaluacion
-      ? `<div class="eval-final ${c.estado}"><b>Resolución del operador (${esc(c.evaluacion.evaluador||'operador')} — ${fmtFecha(c.evaluacion.fecha)}):</b><br>${esc(c.evaluacion.analisis)}${c.evaluacion.fundamento ? `<br><i>Fundamento legal: ${esc(c.evaluacion.fundamento)}</i>` : ''}</div>`
+    const cd = c.correoDatos || {articulosCitados:[]};
+    const extraccion = (cd.remitente || cd.asunto || cd.fechaCorreo || cd.articulosCitados.length)
+      ? `<div class="extraccion"><b>Datos extraídos del correo:</b> `
+        + (cd.remitente ? `De: ${esc(cd.remitente)} · ` : '')
+        + (cd.asunto ? `Asunto: ${esc(cd.asunto)} · ` : '')
+        + (cd.fechaCorreo ? `Fecha: ${esc(cd.fechaCorreo)} · ` : '')
+        + (cd.articulosCitados.length ? `Artículos citados: ${cd.articulosCitados.join(', ')}` : '')
+        + `</div>`
       : '';
-    const formEval = c.estado === 'pendiente' || !c.evaluacion ? `
+    const matchHtml = c.borradorMatch
+      ? `<div class="match-borrador"><b>📌 Coincidencia en el borrador — Artículo ${c.borradorMatch.num}</b> (${c.borradorMatch.motivo === 'citado' ? 'citado en el correo' : 'por similitud de contenido'}):<br>«${esc(c.borradorMatch.extracto)}…»</div>`
+      : '';
+    const flagsHtml = (c.flags||[]).map(f => `<div class="flag ${f.nivel}"><b>${esc(f.ref)}</b>${esc(f.texto)}</div>`).join('');
+    const evalHtml = c.evaluacion
+      ? `<div class="eval-final ${c.estado}"><b>${c.dictamenAuto && c.evaluacion.evaluador === 'Sistema (análisis automático)' ? 'Dictamen automático' : 'Resolución'} (${esc(c.evaluacion.evaluador||'operador')} — ${fmtFecha(c.evaluacion.fecha)}):</b><br>${esc(c.evaluacion.analisis)}${c.evaluacion.fundamento ? `<br><i>Fundamento legal: ${esc(c.evaluacion.fundamento)}</i>` : ''}</div>`
+      : '';
+    const formEval = c.estado === 'pendiente' ? `
       <div class="eval-box no-print">
         <label>Análisis / resolución del operador</label>
         <textarea id="ev-analisis-${c.id}" placeholder="Fundamento de la decisión…">${esc(c.evaluacion?.analisis||'')}</textarea>
         <div class="grid cols-2" style="margin-top:8px;">
           <div><label>Fundamento legal (artículo)</label><input type="text" id="ev-fund-${c.id}" placeholder="Ej: Art. 8 letra b) Ley 21.442" value="${esc(c.evaluacion?.fundamento||'')}"></div>
-          <div><label>Evaluador</label><input type="text" id="ev-eval-${c.id}" placeholder="Nombre del operador" value="${esc(c.evaluacion?.evaluador||'')}"></div>
+          <div><label>Evaluador</label><input type="text" id="ev-eval-${c.id}" placeholder="Nombre del operador" value=""></div>
         </div>
-        <p class="note" style="margin-top:6px;">Sugerencia automática: <span class="badge ${sug.estado}">${ESTADOS[sug.estado]}</span></p>
         <div class="actions">
-          <button class="btn small ok" onclick="resolver(${c.id},'aprobado')">✅ Aprobar e incorporar</button>
-          <button class="btn small warn" onclick="resolver(${c.id},'revision')">🔎 Dejar en revisión</button>
-          <button class="btn small danger" onclick="resolver(${c.id},'descartado')">🚫 Descartar</button>
+          <button class="btn small ok" onclick="resolver(${c.id},'aprobado')">✅ Corresponde — incorporar</button>
+          <button class="btn small warn" onclick="resolver(${c.id},'revision')">🔎 Dejar a revisar</button>
+          <button class="btn small danger" onclick="resolver(${c.id},'descartado')">🚫 No corresponde</button>
         </div>
       </div>` : `
       <div class="actions no-print">
-        <button class="btn small secondary" onclick="reabrir(${c.id})">↩️ Reabrir evaluación</button>
+        <button class="btn small secondary" onclick="reabrir(${c.id})">↩️ Reabrir para evaluación manual</button>
         <button class="btn small danger" onclick="eliminarComentario(${c.id})">🗑️ Eliminar</button>
       </div>`;
 
     return `<div class="comment-item">
       <div class="head">
         <div>
-          <b>${esc(c.nombre)}</b> — ${esc(c.unidad)} <span class="note">(${esc(c.rol)})</span>
-          <div class="meta">📅 ${fmtFecha(c.fecha)} · 🏷️ ${esc(c.tema)}${c.articulo ? ' · 📌 ' + esc(c.articulo) : ''}${c.email ? ' · ✉️ ' + esc(c.email) : ''}</div>
+          <b>${esc(c.nombre)}</b> — ${esc(c.unidad)}
+          <div class="meta">📅 ${fmtFecha(c.fecha)} · 🏷️ ${esc(c.tema)}${c.email ? ' · ✉️ ' + esc(c.email) : ''}</div>
         </div>
         <span class="badge ${c.estado}">${ESTADOS[c.estado]}</span>
       </div>
       <div class="body">${esc(c.comentario)}</div>
-      ${c.propuesta ? `<div class="propuesta"><b>Propuesta de redacción:</b><br>${esc(c.propuesta)}</div>` : ''}
+      ${extraccion}
+      ${matchHtml}
       ${flagsHtml}
       ${evalHtml}
       ${formEval}
@@ -722,7 +914,7 @@ async function resolver(id, estado){
   c.evaluacion = {
     analisis,
     fundamento: $(`ev-fund-${id}`)?.value.trim() || '',
-    evaluador: $(`ev-eval-${id}`)?.value.trim() || '',
+    evaluador: $(`ev-eval-${id}`)?.value.trim() || 'operador',
     fecha: new Date().toISOString()
   };
   await tx('comentarios', 'readwrite', s => s.put(c));
@@ -824,12 +1016,71 @@ async function eliminarDoc(id){
 }
 
 /* ============================================================
-   Exportar / importar / informe
+   Informe imprimible con los comentarios
+   ============================================================ */
+async function imprimirInforme(){
+  const all = await getAll('comentarios');
+  const cfgItems = await getAll('config');
+  const cfg = Object.fromEntries(cfgItems.map(i => [i.clave, i.valor]));
+  all.sort((a,b) => (a.fecha||'').localeCompare(b.fecha||''));
+
+  const n = e => all.filter(c => c.estado === e).length;
+  const grupos = [
+    {estado:'aprobado', titulo:'✅ Corresponde — comentarios que se incorporan al nuevo reglamento'},
+    {estado:'revision', titulo:'🔎 A revisar — comentarios que requieren análisis adicional'},
+    {estado:'descartado', titulo:'🚫 No corresponde — comentarios descartados por contravenir la ley'},
+    {estado:'pendiente', titulo:'⏳ Pendientes de evaluación'}
+  ];
+
+  const item = c => {
+    const cd = c.correoDatos || {articulosCitados:[]};
+    const datos = [
+      cd.remitente ? 'De: ' + esc(cd.remitente) : '',
+      cd.asunto ? 'Asunto: ' + esc(cd.asunto) : '',
+      cd.fechaCorreo ? 'Fecha correo: ' + esc(cd.fechaCorreo) : '',
+      'Materia: ' + esc(c.tema || ''),
+      cd.articulosCitados.length ? 'Arts. citados: ' + cd.articulosCitados.join(', ') : '',
+      c.borradorMatch ? `Coincide con Art. ${c.borradorMatch.num} del borrador` : ''
+    ].filter(Boolean).join(' · ');
+    return `<div class="pr-item">
+      <div class="quien">${esc(c.nombre)} — ${esc(c.unidad)}${c.email ? ' · ' + esc(c.email) : ''} <span style="font-weight:400; color:#555;">(registrado el ${fmtFecha(c.fecha)})</span></div>
+      <div class="datos">${datos}</div>
+      <div class="texto">${esc(c.comentario)}</div>
+      ${c.evaluacion ? `<div class="dictamen ${c.estado}"><b>Dictamen (${esc(c.evaluacion.evaluador||'')} — ${fmtFecha(c.evaluacion.fecha)}):</b> ${esc(c.evaluacion.analisis)}${c.evaluacion.fundamento ? `<br><i>Fundamento legal: ${esc(c.evaluacion.fundamento)}</i>` : ''}</div>` : ''}
+    </div>`;
+  };
+
+  let html = `
+    <h1>Informe de comentarios — Actualización del Reglamento de Copropiedad</h1>
+    <div class="sub">${esc(cfg.nombre || 'Comunidad sin nombre configurado')} · Ley N° 21.442 y D.S. N° 7 (V. y U.) · Informe generado el ${fmtFecha(new Date().toISOString())}${cfg.plazo ? ' · Plazo de recepción: ' + esc(cfg.plazo) : ''}</div>
+    <table class="resumen">
+      <tr><th>Total comentarios</th><th>Corresponde</th><th>A revisar</th><th>No corresponde</th><th>Pendientes</th></tr>
+      <tr><td>${all.length}</td><td>${n('aprobado')}</td><td>${n('revision')}</td><td>${n('descartado')}</td><td>${n('pendiente')}</td></tr>
+    </table>`;
+
+  if(!all.length){
+    html += '<p style="margin-top:14px;">No se han registrado comentarios de residentes a la fecha.</p>';
+  } else {
+    for(const g of grupos){
+      const items = all.filter(c => c.estado === g.estado);
+      if(!items.length) continue;
+      html += `<h2>${g.titulo} (${items.length})</h2>` + items.map(item).join('');
+    }
+  }
+
+  html += `<div class="pie">Documento de trabajo generado por el sistema de actualización del reglamento de copropiedad. Los dictámenes automáticos son referenciales y no reemplazan la revisión jurídica. La modificación del reglamento requiere acuerdo de asamblea extraordinaria (art. 15, Ley 21.442), escritura pública e inscripción en el Registro de Hipotecas y Gravámenes del CBR.</div>`;
+
+  $('print-report').innerHTML = html;
+  window.print();
+}
+
+/* ============================================================
+   Exportar / importar
    ============================================================ */
 async function exportarJSON(){
   const comentarios = await getAll('comentarios');
   const config = await getAll('config');
-  const data = {app:'actualizacion-reglamento', version:1, exportado:new Date().toISOString(), config, comentarios};
+  const data = {app:'actualizacion-reglamento', version:2, exportado:new Date().toISOString(), config, comentarios};
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -862,27 +1113,24 @@ async function importarJSON(input){
 
 async function exportarCSV(){
   const all = await getAll('comentarios');
-  const cab = ['Fecha','Nombre','Unidad','Rol','Email','Materia','Artículo ref.','Comentario','Propuesta','Estado','Análisis operador','Fundamento legal','Evaluador'];
+  const cab = ['Fecha registro','Nombre','Unidad','Email','Materia','Remitente correo','Asunto correo','Fecha correo','Arts. citados','Art. borrador coincidente','Correo/comentario','Estado','Dictamen','Fundamento legal','Evaluador'];
   const q = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
-  const filas = all.map(c => [
-    fmtFecha(c.fecha), c.nombre, c.unidad, c.rol, c.email, c.tema, c.articulo,
-    c.comentario, c.propuesta, ESTADOS[c.estado],
-    c.evaluacion?.analisis || '', c.evaluacion?.fundamento || '', c.evaluacion?.evaluador || ''
-  ].map(q).join(';'));
+  const filas = all.map(c => {
+    const cd = c.correoDatos || {articulosCitados:[]};
+    return [
+      fmtFecha(c.fecha), c.nombre, c.unidad, c.email, c.tema,
+      cd.remitente, cd.asunto, cd.fechaCorreo, cd.articulosCitados.join(' '),
+      c.borradorMatch ? c.borradorMatch.num : '',
+      c.comentario, ESTADOS[c.estado],
+      c.evaluacion?.analisis || '', c.evaluacion?.fundamento || '', c.evaluacion?.evaluador || ''
+    ].map(q).join(';');
+  });
   const csv = '﻿' + cab.map(q).join(';') + '\n' + filas.join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
   a.download = 'comentarios-reglamento-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
   toast('⬇️ Exportación CSV generada');
-}
-
-async function imprimirInforme(){
-  $('f-estado').value = ''; $('f-tema').value = ''; $('f-texto').value = '';
-  await renderComentarios();
-  document.querySelectorAll('section.tab').forEach(s => s.classList.remove('print-target'));
-  $('tab-revision').classList.add('print-target');
-  window.print();
 }
 
 async function borrarTodo(){
